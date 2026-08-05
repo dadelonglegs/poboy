@@ -1,0 +1,19 @@
+{
+  "name": "poboy-server-side-analytics",
+  "version": "0.9.0-beta",
+  "description": "Privacy-Focused 1st-Party Cookie Identity & Multi-Touch Attribution Engine",
+  "main": "poboy.js",
+  "scripts": {
+    "build": "node build_package.js"
+  },
+  "keywords": [
+    "poboy",
+    "data-layer",
+    "attribution",
+    "gtm",
+    "telemetry",
+    "cookieless-tracking"
+  ],
+  "author": "PoBoy Team",
+  "license": "MIT"
+}
