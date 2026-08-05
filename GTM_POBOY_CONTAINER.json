@@ -1,17 +1,17 @@
 {
   "exportFormatVersion": 2,
-  "exportTime": "2026-08-05 18:05:00",
+  "exportTime": "2026-08-05 19:44:00",
   "containerVersion": {
     "path": "accounts/1000/containers/2000/versions/1",
     "accountId": "1000",
     "containerId": "2000",
     "containerVersionId": "1",
-    "name": "PoBoy Data Layer Import",
+    "name": "PoBoy Server Side Analytics GTM Container & GA4 Base Tag",
     "container": {
       "path": "accounts/1000/containers/2000",
       "accountId": "1000",
       "containerId": "2000",
-      "name": "PoBoy Data Layer",
+      "name": "PoBoy Server Side Analytics GTM",
       "publicId": "GTM-POBOY01",
       "usageContext": [
         "WEB"
@@ -22,13 +22,13 @@
         "accountId": "1000",
         "containerId": "2000",
         "tagId": "10",
-        "name": "[Po'Boy] Core Tracker Script",
+        "name": "[Po'Boy] Server Core Tracker Tag",
         "type": "html",
         "parameter": [
           {
             "type": "TEMPLATE",
             "key": "html",
-            "value": "<script>\n  (function() {\n    var origin = window.location.origin;\n    window.PoBoyConfig = Object.assign({\n      endpoint: origin + '/poboy/log.php',\n      cookieDays: 730,\n      enableIndexedDB: true,\n      publishDataLayer: true,\n      autoFillGHLForms: true\n    }, window.PoBoyConfig || {});\n\n    var s = document.createElement('script');\n    s.src = origin + '/poboy/poboy.js';\n    s.async = true;\n    document.head.appendChild(s);\n  })();\n</script>"
+            "value": "<script>\n  window.PoBoyConfig = {\n    endpoint: '{{PoBoy Endpoint URL}}',\n    cookieDays: 730,\n    requestGPSPermission: true,\n    publishDataLayer: true,\n    autoFillGHLForms: true\n  };\n</script>\n<script src=\"{{PoBoy Script URL}}\" async></script>"
           },
           {
             "type": "BOOLEAN",
@@ -44,20 +44,122 @@
       {
         "accountId": "1000",
         "containerId": "2000",
-        "tagId": "11",
-        "name": "[Po'Boy] Conversion Pixel Tag",
-        "type": "html",
+        "tagId": "20",
+        "name": "[Po'Boy GA4] Base Configuration Tag (Auto-Pushes Data Layer)",
+        "type": "googletag",
         "parameter": [
           {
             "type": "TEMPLATE",
-            "key": "html",
-            "value": "<script>\n  if (window.PoBoy && window.PoBoy.trackConversion) {\n    window.PoBoy.trackConversion('Lead Conversion', 0);\n  }\n</script>"
+            "key": "tagId",
+            "value": "{{GA4 Measurement ID}}"
           },
           {
-            "type": "BOOLEAN",
-            "key": "supportDocumentWrite",
-            "value": "false"
+            "type": "LIST",
+            "key": "configSettings",
+            "list": [
+              {
+                "type": "MAP",
+                "map": [
+                  { "type": "TEMPLATE", "key": "parameter", "value": "user_id" },
+                  { "type": "TEMPLATE", "key": "value", "value": "{{dlv - poboy.user_id}}" }
+                ]
+              },
+              {
+                "type": "MAP",
+                "map": [
+                  { "type": "TEMPLATE", "key": "parameter", "value": "poboy_friendly_handle" },
+                  { "type": "TEMPLATE", "key": "value", "value": "{{dlv - poboy.friendly_handle}}" }
+                ]
+              },
+              {
+                "type": "MAP",
+                "map": [
+                  { "type": "TEMPLATE", "key": "parameter", "value": "poboy_channel_group" },
+                  { "type": "TEMPLATE", "key": "value", "value": "{{dlv - poboy.channel_group}}" }
+                ]
+              },
+              {
+                "type": "MAP",
+                "map": [
+                  { "type": "TEMPLATE", "key": "parameter", "value": "poboy_first_touch_source" },
+                  { "type": "TEMPLATE", "key": "value", "value": "{{dlv - poboy.first_touch_source}}" }
+                ]
+              },
+              {
+                "type": "MAP",
+                "map": [
+                  { "type": "TEMPLATE", "key": "parameter", "value": "poboy_first_touch_campaign" },
+                  { "type": "TEMPLATE", "key": "value", "value": "{{dlv - poboy.first_touch_campaign}}" }
+                ]
+              },
+              {
+                "type": "MAP",
+                "map": [
+                  { "type": "TEMPLATE", "key": "parameter", "value": "poboy_gclid" },
+                  { "type": "TEMPLATE", "key": "value", "value": "{{dlv - poboy.gclid}}" }
+                ]
+              },
+              {
+                "type": "MAP",
+                "map": [
+                  { "type": "TEMPLATE", "key": "parameter", "value": "poboy_fbclid" },
+                  { "type": "TEMPLATE", "key": "value", "value": "{{dlv - poboy.fbclid}}" }
+                ]
+              },
+              {
+                "type": "MAP",
+                "map": [
+                  { "type": "TEMPLATE", "key": "parameter", "value": "poboy_city" },
+                  { "type": "TEMPLATE", "key": "value", "value": "{{dlv - poboy.location.city}}" }
+                ]
+              },
+              {
+                "type": "MAP",
+                "map": [
+                  { "type": "TEMPLATE", "key": "parameter", "value": "poboy_country" },
+                  { "type": "TEMPLATE", "key": "value", "value": "{{dlv - poboy.location.country}}" }
+                ]
+              },
+              {
+                "type": "MAP",
+                "map": [
+                  { "type": "TEMPLATE", "key": "parameter", "value": "poboy_timezone" },
+                  { "type": "TEMPLATE", "key": "value", "value": "{{dlv - poboy.location.timezone}}" }
+                ]
+              },
+              {
+                "type": "MAP",
+                "map": [
+                  { "type": "TEMPLATE", "key": "parameter", "value": "poboy_device_category" },
+                  { "type": "TEMPLATE", "key": "value", "value": "{{dlv - poboy.device.category}}" }
+                ]
+              },
+              {
+                "type": "MAP",
+                "map": [
+                  { "type": "TEMPLATE", "key": "parameter", "value": "poboy_os" },
+                  { "type": "TEMPLATE", "key": "value", "value": "{{dlv - poboy.device.os_name}}" }
+                ]
+              },
+              {
+                "type": "MAP",
+                "map": [
+                  { "type": "TEMPLATE", "key": "parameter", "value": "poboy_browser" },
+                  { "type": "TEMPLATE", "key": "value", "value": "{{dlv - poboy.device.browser_name}}" }
+                ]
+              },
+              {
+                "type": "MAP",
+                "map": [
+                  { "type": "TEMPLATE", "key": "parameter", "value": "poboy_execution_ms" },
+                  { "type": "TEMPLATE", "key": "value", "value": "{{dlv - poboy.performance.execution_time_ms}}" }
+                ]
+              }
+            ]
           }
+        ],
+        "firingTriggerId": [
+          "100"
         ],
         "tagFiringOption": "ONCE_PER_EVENT"
       }
@@ -73,16 +175,8 @@
           {
             "type": "EQUALS",
             "parameter": [
-              {
-                "type": "TEMPLATE",
-                "key": "arg0",
-                "value": "{{_event}}"
-              },
-              {
-                "type": "TEMPLATE",
-                "key": "arg1",
-                "value": "poboy_loaded"
-              }
+              { "type": "TEMPLATE", "key": "arg0", "value": "{{_event}}" },
+              { "type": "TEMPLATE", "key": "arg1", "value": "poboy_loaded" }
             ]
           }
         ]
@@ -92,134 +186,240 @@
       {
         "accountId": "1000",
         "containerId": "2000",
-        "variableId": "301",
-        "name": "dlv - poboy.user_id",
-        "type": "v",
+        "variableId": "299",
+        "name": "PoBoy Endpoint URL",
+        "type": "c",
         "parameter": [
-          {
-            "type": "TEMPLATE",
-            "key": "name",
-            "value": "poboy.user_id"
-          },
-          {
-            "type": "TEMPLATE",
-            "key": "dataLayerVersion",
-            "value": "2"
-          }
+          { "type": "TEMPLATE", "key": "value", "value": "https://yourdomain.com/poboy/log.php" }
+        ]
+      },
+      {
+        "accountId": "1000",
+        "containerId": "2000",
+        "variableId": "300",
+        "name": "PoBoy Script URL",
+        "type": "c",
+        "parameter": [
+          { "type": "TEMPLATE", "key": "value", "value": "https://yourdomain.com/poboy/poboy.js" }
+        ]
+      },
+      {
+        "accountId": "1000",
+        "containerId": "2000",
+        "variableId": "301",
+        "name": "GA4 Measurement ID",
+        "type": "c",
+        "parameter": [
+          { "type": "TEMPLATE", "key": "value", "value": "G-XXXXXXXXXX" }
         ]
       },
       {
         "accountId": "1000",
         "containerId": "2000",
         "variableId": "302",
-        "name": "dlv - poboy.friendly_handle",
+        "name": "dlv - poboy.user_id",
         "type": "v",
         "parameter": [
-          {
-            "type": "TEMPLATE",
-            "key": "name",
-            "value": "poboy.friendly_handle"
-          },
-          {
-            "type": "TEMPLATE",
-            "key": "dataLayerVersion",
-            "value": "2"
-          }
+          { "type": "TEMPLATE", "key": "name", "value": "poboy.identity.user_id" },
+          { "type": "TEMPLATE", "key": "dataLayerVersion", "value": "2" }
         ]
       },
       {
         "accountId": "1000",
         "containerId": "2000",
         "variableId": "303",
-        "name": "dlv - poboy.channel_group",
+        "name": "dlv - poboy.friendly_handle",
         "type": "v",
         "parameter": [
-          {
-            "type": "TEMPLATE",
-            "key": "name",
-            "value": "poboy.channel_group"
-          },
-          {
-            "type": "TEMPLATE",
-            "key": "dataLayerVersion",
-            "value": "2"
-          }
+          { "type": "TEMPLATE", "key": "name", "value": "poboy.identity.friendly_handle" },
+          { "type": "TEMPLATE", "key": "dataLayerVersion", "value": "2" }
         ]
       },
       {
         "accountId": "1000",
         "containerId": "2000",
         "variableId": "304",
-        "name": "dlv - poboy.first_touch_source",
+        "name": "dlv - poboy.channel_group",
         "type": "v",
         "parameter": [
-          {
-            "type": "TEMPLATE",
-            "key": "name",
-            "value": "poboy.first_touch_source"
-          },
-          {
-            "type": "TEMPLATE",
-            "key": "dataLayerVersion",
-            "value": "2"
-          }
+          { "type": "TEMPLATE", "key": "name", "value": "poboy.attribution.channel_group" },
+          { "type": "TEMPLATE", "key": "dataLayerVersion", "value": "2" }
         ]
       },
       {
         "accountId": "1000",
         "containerId": "2000",
         "variableId": "305",
-        "name": "dlv - poboy.first_touch_campaign",
+        "name": "dlv - poboy.first_touch_source",
         "type": "v",
         "parameter": [
-          {
-            "type": "TEMPLATE",
-            "key": "name",
-            "value": "poboy.first_touch_campaign"
-          },
-          {
-            "type": "TEMPLATE",
-            "key": "dataLayerVersion",
-            "value": "2"
-          }
+          { "type": "TEMPLATE", "key": "name", "value": "poboy.attribution.first_touch_source" },
+          { "type": "TEMPLATE", "key": "dataLayerVersion", "value": "2" }
         ]
       },
       {
         "accountId": "1000",
         "containerId": "2000",
         "variableId": "306",
-        "name": "dlv - poboy.gclid",
+        "name": "dlv - poboy.first_touch_campaign",
         "type": "v",
         "parameter": [
-          {
-            "type": "TEMPLATE",
-            "key": "name",
-            "value": "poboy.gclid"
-          },
-          {
-            "type": "TEMPLATE",
-            "key": "dataLayerVersion",
-            "value": "2"
-          }
+          { "type": "TEMPLATE", "key": "name", "value": "poboy.attribution.first_touch_campaign" },
+          { "type": "TEMPLATE", "key": "dataLayerVersion", "value": "2" }
         ]
       },
       {
         "accountId": "1000",
         "containerId": "2000",
         "variableId": "307",
+        "name": "dlv - poboy.gclid",
+        "type": "v",
+        "parameter": [
+          { "type": "TEMPLATE", "key": "name", "value": "poboy.gclid" },
+          { "type": "TEMPLATE", "key": "dataLayerVersion", "value": "2" }
+        ]
+      },
+      {
+        "accountId": "1000",
+        "containerId": "2000",
+        "variableId": "308",
         "name": "dlv - poboy.fbclid",
         "type": "v",
         "parameter": [
-          {
-            "type": "TEMPLATE",
-            "key": "name",
-            "value": "poboy.fbclid"
-          },
-          {
-            "type": "TEMPLATE",
-            "key": "dataLayerVersion",
-            "value": "2"
-          }
+          { "type": "TEMPLATE", "key": "name", "value": "poboy.fbclid" },
+          { "type": "TEMPLATE", "key": "dataLayerVersion", "value": "2" }
+        ]
+      },
+      {
+        "accountId": "1000",
+        "containerId": "2000",
+        "variableId": "309",
+        "name": "dlv - poboy.session_id",
+        "type": "v",
+        "parameter": [
+          { "type": "TEMPLATE", "key": "name", "value": "poboy.session.session_id" },
+          { "type": "TEMPLATE", "key": "dataLayerVersion", "value": "2" }
+        ]
+      },
+      {
+        "accountId": "1000",
+        "containerId": "2000",
+        "variableId": "310",
+        "name": "dlv - poboy.visit_count",
+        "type": "v",
+        "parameter": [
+          { "type": "TEMPLATE", "key": "name", "value": "poboy.session.visit_count" },
+          { "type": "TEMPLATE", "key": "dataLayerVersion", "value": "2" }
+        ]
+      },
+      {
+        "accountId": "1000",
+        "containerId": "2000",
+        "variableId": "311",
+        "name": "dlv - poboy.location.city",
+        "type": "v",
+        "parameter": [
+          { "type": "TEMPLATE", "key": "name", "value": "poboy.location.city" },
+          { "type": "TEMPLATE", "key": "dataLayerVersion", "value": "2" }
+        ]
+      },
+      {
+        "accountId": "1000",
+        "containerId": "2000",
+        "variableId": "312",
+        "name": "dlv - poboy.location.country",
+        "type": "v",
+        "parameter": [
+          { "type": "TEMPLATE", "key": "name", "value": "poboy.location.country" },
+          { "type": "TEMPLATE", "key": "dataLayerVersion", "value": "2" }
+        ]
+      },
+      {
+        "accountId": "1000",
+        "containerId": "2000",
+        "variableId": "313",
+        "name": "dlv - poboy.location.timezone",
+        "type": "v",
+        "parameter": [
+          { "type": "TEMPLATE", "key": "name", "value": "poboy.location.timezone" },
+          { "type": "TEMPLATE", "key": "dataLayerVersion", "value": "2" }
+        ]
+      },
+      {
+        "accountId": "1000",
+        "containerId": "2000",
+        "variableId": "314",
+        "name": "dlv - poboy.meta.page_title",
+        "type": "v",
+        "parameter": [
+          { "type": "TEMPLATE", "key": "name", "value": "poboy.meta.page_title" },
+          { "type": "TEMPLATE", "key": "dataLayerVersion", "value": "2" }
+        ]
+      },
+      {
+        "accountId": "1000",
+        "containerId": "2000",
+        "variableId": "315",
+        "name": "dlv - poboy.meta.description",
+        "type": "v",
+        "parameter": [
+          { "type": "TEMPLATE", "key": "name", "value": "poboy.meta.description" },
+          { "type": "TEMPLATE", "key": "dataLayerVersion", "value": "2" }
+        ]
+      },
+      {
+        "accountId": "1000",
+        "containerId": "2000",
+        "variableId": "316",
+        "name": "dlv - poboy.meta.heading_h1",
+        "type": "v",
+        "parameter": [
+          { "type": "TEMPLATE", "key": "name", "value": "poboy.meta.heading_h1" },
+          { "type": "TEMPLATE", "key": "dataLayerVersion", "value": "2" }
+        ]
+      },
+      {
+        "accountId": "1000",
+        "containerId": "2000",
+        "variableId": "317",
+        "name": "dlv - poboy.device.category",
+        "type": "v",
+        "parameter": [
+          { "type": "TEMPLATE", "key": "name", "value": "poboy.device.category" },
+          { "type": "TEMPLATE", "key": "dataLayerVersion", "value": "2" }
+        ]
+      },
+      {
+        "accountId": "1000",
+        "containerId": "2000",
+        "variableId": "318",
+        "name": "dlv - poboy.device.os_name",
+        "type": "v",
+        "parameter": [
+          { "type": "TEMPLATE", "key": "name", "value": "poboy.device.os_name" },
+          { "type": "TEMPLATE", "key": "dataLayerVersion", "value": "2" }
+        ]
+      },
+      {
+        "accountId": "1000",
+        "containerId": "2000",
+        "variableId": "319",
+        "name": "dlv - poboy.device.browser_name",
+        "type": "v",
+        "parameter": [
+          { "type": "TEMPLATE", "key": "name", "value": "poboy.device.browser_name" },
+          { "type": "TEMPLATE", "key": "dataLayerVersion", "value": "2" }
+        ]
+      },
+      {
+        "accountId": "1000",
+        "containerId": "2000",
+        "variableId": "320",
+        "name": "dlv - poboy.performance.execution_time_ms",
+        "type": "v",
+        "parameter": [
+          { "type": "TEMPLATE", "key": "name", "value": "poboy.performance.execution_time_ms" },
+          { "type": "TEMPLATE", "key": "dataLayerVersion", "value": "2" }
         ]
       }
     ]
