@@ -4,6 +4,7 @@
  * GitHub: github.com/dadelonglegs/poboy
  */
 
+if (function_exists('opcache_invalidate')) { @opcache_invalidate(__FILE__, true); }
 require_once __DIR__ . '/config.php';
 session_start();
 
