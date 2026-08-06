@@ -1,12 +1,13 @@
 <?php
 /**
- * Po'Boy Server Side Analytics v0.9.0-beta
+ * Po'Boy Server Side Analytics - GA4 Enterprise Analytics Suite v0.9.0-beta
  * GitHub: github.com/dadelonglegs/poboy
  */
 
-if (function_exists('opcache_invalidate')) { @opcache_invalidate(__FILE__, true); }
 require_once __DIR__ . '/config.php';
 session_start();
+
+if (function_exists('opcache_invalidate')) { @opcache_invalidate(__FILE__, true); }
 
 if (isset($_GET['logout'])) {
     unset($_SESSION['sc_authenticated']);
@@ -30,48 +31,46 @@ $isAuthenticated = $_SESSION['sc_authenticated'] ?? false;
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Po'Boy Server Side Analytics</title>
+    <title>Po'Boy Analytics - Google Analytics Enterprise Suite</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <style>
         :root {
-            --bg-dark: #050b14;
-            --bg-card: #0b162a;
-            --bg-card-hover: #122442;
-            --border-color: rgba(251, 79, 20, 0.25);
-            --border-subtle: rgba(255, 255, 255, 0.08);
-            --primary: #fb4f14;
-            --primary-hover: #ff6b2b;
-            --navy-brand: #002244;
-            --navy-light: #162a4a;
-            --primary-gradient: linear-gradient(135deg, #fb4f14 0%, #ff7a00 50%, #002244 100%);
-            --accent-gradient: linear-gradient(135deg, #002244 0%, #0e1e38 60%, #fb4f14 100%);
-            --accent-orange: #fb4f14;
-            --accent-gold: #ffb703;
+            --bg-page: #0f172a;
+            --bg-card: #1e293b;
+            --bg-card-hover: #334155;
+            --border-color: rgba(226, 232, 240, 0.1);
+            --border-highlight: rgba(56, 189, 248, 0.3);
+            --primary: #38bdf8;
+            --primary-hover: #0284c7;
+            --accent-indigo: #6366f1;
             --accent-green: #10b981;
-            --accent-cyan: #38bdf8;
+            --accent-amber: #f59e0b;
+            --accent-orange: #fb4f14;
+            --accent-rose: #f43f5e;
             --text-primary: #f8fafc;
             --text-secondary: #94a3b8;
             --text-muted: #64748b;
-            --radius-lg: 16px;
-            --radius-md: 10px;
-            --font-sans: 'Outfit', -apple-system, sans-serif;
+            --radius-lg: 12px;
+            --radius-md: 8px;
+            --font-sans: 'Inter', -apple-system, sans-serif;
             --font-mono: 'JetBrains Mono', monospace;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
-            background-color: var(--bg-dark);
+            background-color: var(--bg-page);
             color: var(--text-primary);
             font-family: var(--font-sans);
             line-height: 1.5;
             min-height: 100vh;
-            padding-bottom: 50px;
+            display: flex;
+            flex-direction: column;
         }
 
-        /* LOGIN SCREEN */
+        /* LOGIN CONTAINER */
         .login-container {
             max-width: 440px;
             margin: 100px auto;
@@ -79,614 +78,579 @@ $isAuthenticated = $_SESSION['sc_authenticated'] ?? false;
             background: var(--bg-card);
             border: 1px solid var(--border-color);
             border-radius: var(--radius-lg);
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8), 0 0 35px rgba(251, 79, 20, 0.15);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
             text-align: center;
-            position: relative;
-            overflow: hidden;
-        }
-        .login-container::before {
-            content: '';
-            position: absolute;
-            top: 0; left: 0; right: 0; height: 5px;
-            background: var(--primary-gradient);
         }
         .login-logo {
-            font-size: 30px;
+            font-size: 28px;
             font-weight: 800;
-            background: linear-gradient(135deg, #fb4f14 0%, #ff8a50 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            margin-bottom: 8px;
-            letter-spacing: -0.5px;
+            color: #ffffff;
+            margin-bottom: 6px;
         }
-        .login-sub {
-            font-size: 13px;
-            color: var(--text-secondary);
-            margin-bottom: 24px;
-        }
+        .login-sub { font-size: 13px; color: var(--text-secondary); margin-bottom: 24px; }
         .form-group { margin-top: 20px; text-align: left; }
         .form-group label { display: block; font-size: 13px; color: var(--text-secondary); margin-bottom: 8px; font-weight: 500; }
         .form-input {
             width: 100%;
             padding: 12px 16px;
-            background: #050b14;
+            background: #0f172a;
             border: 1px solid var(--border-color);
             border-radius: var(--radius-md);
             color: var(--text-primary);
-            font-size: 15px;
+            font-size: 14px;
             outline: none;
             transition: all 0.2s;
         }
-        .form-input:focus {
-            border-color: var(--accent-orange);
-            box-shadow: 0 0 15px rgba(251, 79, 20, 0.3);
-        }
+        .form-input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.2); }
         .btn-primary {
             width: 100%;
-            padding: 14px;
+            padding: 12px;
             background: var(--primary);
-            color: #ffffff;
+            color: #0f172a;
             border: none;
             border-radius: var(--radius-md);
-            font-size: 15px;
+            font-size: 14px;
             font-weight: 700;
             cursor: pointer;
             margin-top: 24px;
             transition: all 0.2s;
-            box-shadow: 0 4px 15px rgba(251, 79, 20, 0.4);
         }
-        .btn-primary:hover {
-            background: var(--primary-hover);
-            transform: translateY(-1px);
-            box-shadow: 0 6px 20px rgba(251, 79, 20, 0.6);
-        }
-        .error-msg {
-            background: rgba(239, 68, 68, 0.15);
-            border: 1px solid rgba(239, 68, 68, 0.4);
-            color: #fca5a5;
-            padding: 10px;
-            border-radius: var(--radius-md);
-            font-size: 13px;
-            margin-bottom: 16px;
-        }
+        .btn-primary:hover { background: var(--primary-hover); color: #ffffff; }
 
-        /* MAIN LAYOUT */
-        .header-bar {
-            background: var(--navy-gradient);
+        /* HEADER BAR */
+        .ga4-header {
+            background: #0f172a;
             border-bottom: 1px solid var(--border-color);
-            padding: 16px 32px;
+            padding: 12px 24px;
             display: flex;
             justify-content: space-between;
             align-items: center;
             position: sticky;
             top: 0;
             z-index: 100;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
         }
-        .brand {
-            font-size: 20px;
-            font-weight: 800;
+        .ga4-brand {
             display: flex;
             align-items: center;
             gap: 12px;
+            font-size: 18px;
+            font-weight: 700;
             color: #ffffff;
         }
-        .brand-badge {
+        .ga4-logo-icon {
+            width: 32px; height: 32px;
+            background: linear-gradient(135deg, #38bdf8 0%, #6366f1 100%);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            color: #ffffff;
+        }
+        .ga4-badge {
             font-size: 11px;
-            background: rgba(251, 79, 20, 0.2);
-            color: var(--accent-orange);
-            border: 1px solid rgba(251, 79, 20, 0.4);
-            padding: 3px 9px;
-            border-radius: 20px;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
+            background: rgba(56, 189, 248, 0.15);
+            color: var(--primary);
+            border: 1px solid rgba(56, 189, 248, 0.3);
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-weight: 600;
         }
-        .user-nav { display: flex; align-items: center; gap: 16px; }
-        .logout-link {
+        .ga4-user-nav { display: flex; align-items: center; gap: 16px; font-size: 13px; color: var(--text-secondary); }
+        .logout-link { color: var(--text-secondary); text-decoration: none; padding: 6px 12px; border: 1px solid var(--border-color); border-radius: 6px; }
+        .logout-link:hover { color: #ffffff; border-color: var(--primary); }
+
+        /* NAVIGATION TABS BAR */
+        .ga4-nav-tabs {
+            background: #1e293b;
+            border-bottom: 1px solid var(--border-color);
+            padding: 0 24px;
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+        }
+        .nav-tab {
+            padding: 14px 18px;
             color: var(--text-secondary);
-            text-decoration: none;
             font-size: 13px;
-            padding: 6px 14px;
-            border: 1px solid var(--border-subtle);
-            border-radius: 6px;
+            font-weight: 600;
+            border: none;
+            background: none;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
             transition: all 0.2s;
+            white-space: nowrap;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
-        .logout-link:hover { color: #ffffff; border-color: var(--accent-orange); background: rgba(251, 79, 20, 0.1); }
+        .nav-tab:hover { color: #ffffff; }
+        .nav-tab.active { color: var(--primary); border-bottom-color: var(--primary); }
 
-        .container { max-width: 1400px; margin: 24px auto; padding: 0 24px; }
+        /* MAIN CONTAINER */
+        .ga4-body { flex: 1; padding: 24px; max-width: 1600px; margin: 0 auto; width: 100%; }
 
-        /* HERO DATE BAR & TABS */
-        .date-bar {
+        /* FILTER & DATE CONTROLS */
+        .controls-bar {
             background: var(--bg-card);
             border: 1px solid var(--border-color);
             border-radius: var(--radius-lg);
-            padding: 16px 24px;
+            padding: 16px 20px;
             margin-bottom: 24px;
             display: flex;
             justify-content: space-between;
             align-items: center;
             flex-wrap: wrap;
             gap: 16px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
         }
-
-        .tab-nav {
-            display: flex;
-            gap: 8px;
-            margin-bottom: 24px;
-            border-bottom: 1px solid var(--border-subtle);
-            padding-bottom: 12px;
-            overflow-x: auto;
-        }
-        .tab-btn {
-            padding: 10px 20px;
-            background: var(--bg-card);
-            border: 1px solid var(--border-subtle);
-            color: var(--text-secondary);
-            border-radius: var(--radius-md);
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s;
-            white-space: nowrap;
-        }
-        .tab-btn:hover { color: #ffffff; border-color: var(--border-color); background: var(--bg-card-hover); }
-        .tab-btn.active {
-            background: var(--primary);
-            color: #ffffff;
-            border-color: var(--accent-orange);
-            box-shadow: 0 4px 15px rgba(251, 79, 20, 0.3);
-        }
-
-        /* METRIC CARDS */
-        .metrics-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 16px;
-            margin-bottom: 24px;
-        }
-        .metric-card {
-            background: var(--bg-card);
-            border: 1px solid var(--border-subtle);
-            border-radius: var(--radius-lg);
-            padding: 20px;
-            position: relative;
-            overflow: hidden;
-            transition: all 0.2s;
-        }
-        .metric-card:hover {
-            border-color: var(--border-color);
-            transform: translateY(-2px);
-            box-shadow: 0 10px 25px rgba(0,0,0,0.4);
-        }
-        .metric-card::after {
-            content: '';
-            position: absolute;
-            top: 0; left: 0; width: 4px; height: 100%;
-            background: var(--primary);
-        }
-        .metric-title { font-size: 12px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600; }
-        .metric-value { font-size: 32px; font-weight: 800; color: #ffffff; margin: 6px 0; font-family: var(--font-mono); }
-        .metric-sub { font-size: 12px; color: var(--text-muted); }
-
-        /* PRESET CHIPS & INPUTS */
-        .preset-chips { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; }
+        .preset-group { display: flex; gap: 6px; flex-wrap: wrap; }
         .chip {
-            padding: 6px 14px;
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid var(--border-subtle);
-            border-radius: 20px;
+            padding: 6px 12px;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
             font-size: 12px;
             color: var(--text-secondary);
             cursor: pointer;
             transition: all 0.2s;
             font-weight: 500;
         }
-        .chip:hover, .chip.active {
-            background: rgba(251, 79, 20, 0.2);
-            color: var(--accent-orange);
-            border-color: var(--accent-orange);
-        }
+        .chip:hover, .chip.active { background: rgba(56, 189, 248, 0.15); color: var(--primary); border-color: var(--primary); }
 
-        .rule-input, .rule-select {
-            padding: 8px 12px;
-            background: #050b14;
-            border: 1px solid var(--border-subtle);
+        .date-input {
+            padding: 7px 12px;
+            background: #0f172a;
+            border: 1px solid var(--border-color);
             border-radius: var(--radius-md);
             color: var(--text-primary);
             font-size: 13px;
             outline: none;
         }
-        .rule-input:focus, .rule-select:focus { border-color: var(--accent-orange); }
+        .date-input:focus { border-color: var(--primary); }
 
-        /* PANELS & CARDS */
-        .panel {
-            background: var(--bg-card);
-            border: 1px solid var(--border-subtle);
-            border-radius: var(--radius-lg);
-            padding: 24px;
-            margin-bottom: 24px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
-        }
-        .panel-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
-            gap: 12px;
-        }
-        .panel-title { font-size: 18px; font-weight: 700; color: #ffffff; }
-        .panel-sub { font-size: 13px; color: var(--text-secondary); }
-
-        /* CHARTS / BREAKDOWNS */
-        .analytics-grid {
+        /* SCORECARDS GRID */
+        .scorecards-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        .scorecard {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 20px;
+            position: relative;
+        }
+        .scorecard-label { font-size: 12px; color: var(--text-secondary); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+        .scorecard-value { font-size: 32px; font-weight: 800; color: #ffffff; margin: 8px 0; font-family: var(--font-mono); }
+        .scorecard-trend { font-size: 12px; color: var(--accent-green); display: flex; align-items: center; gap: 4px; }
+
+        /* GRID LAYOUT FOR CHARTS & TABLES */
+        .reports-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(480px, 1fr));
             gap: 20px;
             margin-bottom: 24px;
         }
-        .bar-row { margin-bottom: 12px; }
-        .bar-label { display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 4px; font-weight: 500; }
-        .bar-track { height: 10px; background: rgba(255,255,255,0.05); border-radius: 5px; overflow: hidden; }
-        .bar-fill { height: 100%; background: linear-gradient(90deg, #fb4f14, #ff7a00); border-radius: 5px; transition: width 0.4s ease; }
+        .card-panel {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+        }
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+        .card-title { font-size: 16px; font-weight: 700; color: #ffffff; }
+        .card-sub { font-size: 12px; color: var(--text-secondary); }
 
-        /* DATA TABLE */
-        .data-table {
+        /* PROGRESS BARS & BARS */
+        .dim-row { margin-bottom: 14px; }
+        .dim-info { display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 6px; font-weight: 500; }
+        .dim-track { height: 8px; background: #0f172a; border-radius: 4px; overflow: hidden; }
+        .dim-bar { height: 100%; background: linear-gradient(90deg, #38bdf8, #6366f1); border-radius: 4px; transition: width 0.4s ease; }
+
+        /* DATA TABLES */
+        .ga4-table {
             width: 100%;
             border-collapse: collapse;
             font-size: 13px;
             text-align: left;
         }
-        .data-table th {
-            padding: 14px 16px;
-            background: rgba(0, 34, 68, 0.6);
+        .ga4-table th {
+            padding: 12px 14px;
+            background: #0f172a;
             color: var(--text-secondary);
             font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
             border-bottom: 1px solid var(--border-color);
+            text-transform: uppercase;
+            font-size: 11px;
+            letter-spacing: 0.5px;
         }
-        .data-table td {
-            padding: 14px 16px;
-            border-bottom: 1px solid var(--border-subtle);
+        .ga4-table td {
+            padding: 12px 14px;
+            border-bottom: 1px solid var(--border-color);
             color: var(--text-primary);
-            vertical-align: middle;
         }
-        .data-table tr:hover td { background: var(--bg-card-hover); }
+        .ga4-table tr:hover td { background: var(--bg-card-hover); }
 
-        /* BADGES & BUTTONS */
-        .friendly-badge {
+        /* BADGES */
+        .handle-badge {
             display: inline-flex;
             align-items: center;
-            gap: 8px;
-            padding: 4px 10px;
-            background: rgba(251, 79, 20, 0.12);
-            border: 1px solid rgba(251, 79, 20, 0.3);
-            color: var(--accent-orange);
+            gap: 6px;
+            padding: 3px 8px;
+            background: rgba(56, 189, 248, 0.1);
+            border: 1px solid rgba(56, 189, 248, 0.25);
+            color: var(--primary);
             border-radius: 6px;
-            font-weight: 600;
             font-family: var(--font-mono);
             font-size: 12px;
+            font-weight: 600;
         }
-        .avatar-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent-orange); display: inline-block; }
+        .pulse-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--primary); display: inline-block; box-shadow: 0 0 8px var(--primary); }
 
-        .channel-badge {
-            padding: 4px 10px;
+        .badge-channel {
+            padding: 3px 8px;
             border-radius: 12px;
             font-size: 11px;
-            font-weight: 700;
+            font-weight: 600;
             text-transform: uppercase;
         }
-        .channel-paid-search { background: rgba(251, 79, 20, 0.2); color: #fb4f14; border: 1px solid rgba(251, 79, 20, 0.4); }
-        .channel-organic-search { background: rgba(16, 185, 129, 0.2); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.4); }
-        .channel-organic-social { background: rgba(56, 189, 248, 0.2); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.4); }
-        .channel-direct { background: rgba(148, 163, 184, 0.15); color: #cbd5e1; border: 1px solid rgba(148, 163, 184, 0.3); }
+        .badge-paid { background: rgba(251, 79, 20, 0.15); color: #fb4f14; border: 1px solid rgba(251, 79, 20, 0.3); }
+        .badge-organic { background: rgba(16, 185, 129, 0.15); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.3); }
+        .badge-social { background: rgba(56, 189, 248, 0.15); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.3); }
+        .badge-direct { background: rgba(148, 163, 184, 0.15); color: #cbd5e1; border: 1px solid rgba(148, 163, 184, 0.3); }
 
-        .converted-badge {
-            background: rgba(16, 185, 129, 0.2);
-            color: #10b981;
-            border: 1px solid rgba(16, 185, 129, 0.4);
-            padding: 2px 8px;
-            border-radius: 4px;
-            font-size: 10px;
-            font-weight: 800;
-        }
-
-        .tag {
-            display: inline-block;
-            padding: 2px 8px;
-            background: rgba(255,255,255,0.06);
-            border: 1px solid var(--border-subtle);
-            border-radius: 4px;
-            font-size: 11px;
-            color: var(--text-secondary);
-            margin-right: 4px;
-            margin-bottom: 4px;
-            font-family: var(--font-mono);
-        }
-
-        .btn-view {
-            padding: 6px 12px;
-            background: rgba(251, 79, 20, 0.15);
-            border: 1px solid rgba(251, 79, 20, 0.3);
-            color: var(--accent-orange);
+        .btn-action {
+            padding: 5px 10px;
+            background: rgba(56, 189, 248, 0.1);
+            border: 1px solid rgba(56, 189, 248, 0.3);
+            color: var(--primary);
             border-radius: 6px;
             cursor: pointer;
             font-size: 12px;
             font-weight: 600;
-            transition: all 0.2s;
         }
-        .btn-view:hover { background: var(--primary); color: #ffffff; }
+        .btn-action:hover { background: var(--primary); color: #0f172a; }
 
         /* MAP */
-        #map { height: 420px; border-radius: var(--radius-md); border: 1px solid var(--border-subtle); }
+        #map { height: 440px; border-radius: var(--radius-md); border: 1px solid var(--border-color); }
 
         /* MODAL */
-        .modal-backdrop {
+        .modal-bg {
             position: fixed;
             top: 0; left: 0; width: 100vw; height: 100vh;
-            background: rgba(0,0,0,0.85);
+            background: rgba(15, 23, 42, 0.85);
             backdrop-filter: blur(8px);
             z-index: 1000;
             display: none;
             align-items: center;
             justify-content: center;
         }
-        .modal-backdrop.active { display: flex; }
-        .modal-box {
+        .modal-bg.active { display: flex; }
+        .modal-card {
             background: var(--bg-card);
             border: 1px solid var(--border-color);
             border-radius: var(--radius-lg);
-            width: 90%;
-            max-width: 800px;
-            max-height: 85vh;
-            overflow-y: auto;
+            width: 90%; max-width: 860px;
+            max-height: 85vh; overflow-y: auto;
             padding: 32px;
-            box-shadow: 0 25px 60px rgba(0,0,0,0.9);
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.7);
         }
-        .modal-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 24px; border-bottom: 1px solid var(--border-subtle); padding-bottom: 16px; }
-        .close-btn { font-size: 24px; cursor: pointer; color: var(--text-secondary); }
-        .close-btn:hover { color: #ffffff; }
+        .modal-close { font-size: 20px; cursor: pointer; color: var(--text-secondary); }
+        .modal-close:hover { color: #ffffff; }
 
-        .timeline-tree { border-left: 2px solid var(--border-color); padding-left: 20px; margin-left: 10px; }
-        .timeline-item { position: relative; margin-bottom: 24px; }
-        .timeline-item::before {
-            content: '';
-            position: absolute;
-            left: -26px; top: 4px;
-            width: 10px; height: 10px;
-            border-radius: 50%;
-            background: var(--accent-orange);
-            box-shadow: 0 0 10px var(--accent-orange);
+        .tree-line { border-left: 2px solid var(--border-highlight); padding-left: 18px; margin-left: 8px; }
+        .tree-node { position: relative; margin-bottom: 20px; }
+        .tree-node::before {
+            content: ''; position: absolute; left: -24px; top: 4px;
+            width: 10px; height: 10px; border-radius: 50%;
+            background: var(--primary); box-shadow: 0 0 10px var(--primary);
         }
-        .timeline-title { font-weight: 700; font-size: 14px; color: #ffffff; margin-bottom: 4px; }
-        .timeline-detail { background: #050b14; padding: 12px 16px; border-radius: 8px; border: 1px solid var(--border-subtle); font-family: var(--font-mono); font-size: 12px; color: var(--text-secondary); line-height: 1.6; }
+        .tree-box { background: #0f172a; padding: 14px 18px; border-radius: 8px; border: 1px solid var(--border-color); font-family: var(--font-mono); font-size: 12px; color: var(--text-secondary); line-height: 1.6; }
 
-        /* FILTER RULES BUILDER */
-        .rules-container { display: flex; flex-direction: column; gap: 10px; margin-bottom: 16px; }
-        .rule-row { display: flex; gap: 10px; align-items: center; background: #050b14; padding: 10px 14px; border-radius: 8px; border: 1px solid var(--border-subtle); flex-wrap: wrap; }
-        .btn-add-rule { padding: 8px 16px; background: rgba(251, 79, 20, 0.15); border: 1px dashed var(--accent-orange); color: var(--accent-orange); border-radius: 8px; cursor: pointer; font-size: 13px; font-weight: 600; width: 100%; text-align: center; }
-        .btn-add-rule:hover { background: rgba(251, 79, 20, 0.25); }
-        .btn-remove-rule { background: rgba(239, 68, 68, 0.2); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.4); padding: 4px 10px; border-radius: 6px; cursor: pointer; font-size: 12px; }
+        /* RULES QUERY BUILDER */
+        .rules-wrapper { display: flex; flex-direction: column; gap: 10px; margin-bottom: 16px; }
+        .rule-item { display: flex; gap: 10px; align-items: center; background: #0f172a; padding: 10px 14px; border-radius: 8px; border: 1px solid var(--border-color); flex-wrap: wrap; }
     </style>
 </head>
 <body>
 
 <?php if (!$isAuthenticated): ?>
     <div class="login-container">
-        <div class="login-logo"> Po'Boy Server Side</div>
-        <div class="login-sub">Universal Visitor Telemetry & Attribution Engine</div>
+        <div class="login-logo">Po'Boy Analytics</div>
+        <div class="login-sub">Google Analytics Enterprise Suite & Attribution Engine</div>
         
         <?php if ($loginError): ?>
-            <div class="error-msg"><?php echo htmlspecialchars($loginError); ?></div>
+            <div style="background: rgba(244, 63, 94, 0.15); border: 1px solid rgba(244, 63, 94, 0.3); color: #fecdd3; padding: 10px; border-radius: 6px; font-size: 13px; margin-bottom: 16px;"><?php echo htmlspecialchars($loginError); ?></div>
         <?php endif; ?>
 
         <form method="POST">
             <div class="form-group">
-                <label>Dashboard Authentication Password</label>
+                <label>Access Password</label>
                 <input type="password" name="password" class="form-input" placeholder="Enter password..." required autofocus>
             </div>
-            <button type="submit" class="btn-primary">Unlock Dashboard ➔</button>
+            <button type="submit" class="btn-primary">Unlock Analytics Suite ➔</button>
         </form>
     </div>
 <?php else: ?>
-    <header class="header-bar">
-        <div class="brand">
-            🥪 Po'Boy Server Side Analytics <span class="brand-badge">v0.9.0-beta</span>
+    <header class="ga4-header">
+        <div class="ga4-brand">
+            <div class="ga4-logo-icon">📊</div>
+            <span>Po'Boy Server Side Analytics</span>
+            <span class="ga4-badge">v0.9.0-beta</span>
         </div>
-        <div class="user-nav">
-            <span style="font-size: 13px; color: var(--text-secondary);">GitHub: <a href="https://github.com/dadelonglegs/poboy" target="_blank" style="color: var(--accent-orange); text-decoration: none;">dadelonglegs/poboy</a></span>
+        <div class="ga4-user-nav">
+            <span>Repository: <a href="https://github.com/dadelonglegs/poboy" target="_blank" style="color: var(--primary); text-decoration: none;">dadelonglegs/poboy</a></span>
             <a href="?logout=1" class="logout-link">Logout</a>
         </div>
     </header>
 
-    <div class="container">
-        <!-- HERO DATE RANGE BAR -->
-        <div class="date-bar">
+    <!-- NAVIGATION TABS -->
+    <nav class="ga4-nav-tabs">
+        <button class="nav-tab active" onclick="showSection('overview')">🏠 Realtime Overview</button>
+        <button class="nav-tab" onclick="showSection('acquisition')">🎯 Acquisition & Attribution</button>
+        <button class="nav-tab" onclick="showSection('tech')">🖥️ Tech & Hardware Dimensions</button>
+        <button class="nav-tab" onclick="showSection('content')">📄 Pages & Content Telemetry</button>
+        <button class="nav-tab" onclick="showSection('location')">🗺️ Geographic Intelligence</button>
+        <button class="nav-tab" onclick="showSection('query')">🎛️ Custom Dimension Explorer & Export</button>
+    </nav>
+
+    <main class="ga4-body">
+        <!-- GLOBAL CONTROL BAR -->
+        <div class="controls-bar">
             <div>
-                <h3 style="font-size: 16px; font-weight: 700; color: #ffffff;">📅 Date Range & Filter Control Hub</h3>
-                <p style="font-size: 12px; color: var(--text-secondary);">Filter real-time telemetry logs by custom timeframes</p>
+                <h3 style="font-size: 15px; font-weight: 700;">📅 Date Range Explorer</h3>
+                <p style="font-size: 12px; color: var(--text-secondary);">Select timeline to inspect real-time dimensions</p>
             </div>
-            <div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center;">
-                <div class="preset-chips" style="margin-bottom: 0;">
-                    <div class="chip" onclick="setDateRange('today')">Today</div>
-                    <div class="chip" onclick="setDateRange('yesterday')">Yesterday</div>
-                    <div class="chip" onclick="setDateRange('7days')">Last 7 Days</div>
-                    <div class="chip" onclick="setDateRange('30days')">Last 30 Days</div>
-                    <div class="chip active" onclick="setDateRange('all')" id="chip-all">All Time</div>
+            <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+                <div class="preset-group">
+                    <div class="chip" onclick="setDateFilter('today')">Today</div>
+                    <div class="chip" onclick="setDateFilter('yesterday')">Yesterday</div>
+                    <div class="chip" onclick="setDateFilter('7days')">Last 7 Days</div>
+                    <div class="chip" onclick="setDateFilter('30days')">Last 30 Days</div>
+                    <div class="chip active" onclick="setDateFilter('all')" id="chip-all">All Time</div>
                 </div>
                 <div style="display: flex; gap: 6px; align-items: center;">
-                    <input type="date" id="startDate" class="rule-input">
-                    <span style="color: var(--text-muted); font-size: 12px;">to</span>
-                    <input type="date" id="endDate" class="rule-input">
-                    <button onclick="loadLogs()" class="btn-view" style="padding: 8px 14px; background: var(--primary); color:#ffffff;">Apply</button>
+                    <input type="date" id="startDate" class="date-input">
+                    <span style="font-size: 12px; color: var(--text-muted);">to</span>
+                    <input type="date" id="endDate" class="date-input">
+                    <button onclick="fetchTelemetry()" class="btn-action" style="padding: 7px 14px; background: var(--primary); color:#0f172a;">Apply</button>
                 </div>
             </div>
         </div>
 
-        <!-- TOP METRICS GRID -->
-        <div class="metrics-grid">
-            <div class="metric-card">
-                <div class="metric-title">Unique Tracked Visitors</div>
-                <div class="metric-value" id="stat-unique">0</div>
-                <div class="metric-sub">Self-healing handles</div>
+        <!-- SCORECARDS GRID -->
+        <div class="scorecards-grid">
+            <div class="scorecard">
+                <div class="scorecard-label">Active Users</div>
+                <div class="scorecard-value" id="card-users">0</div>
+                <div class="scorecard-trend"><span>⚡ Unique Fingerprinted Handles</span></div>
             </div>
-            <div class="metric-card">
-                <div class="metric-title">Sessions Generated</div>
-                <div class="metric-value" id="stat-sessions">0</div>
-                <div class="metric-sub">Auto 30-min timeouts</div>
+            <div class="scorecard">
+                <div class="scorecard-label">Total Sessions</div>
+                <div class="scorecard-value" id="card-sessions">0</div>
+                <div class="scorecard-trend"><span>⏱️ 30-Min Inactivity Windows</span></div>
             </div>
-            <div class="metric-card">
-                <div class="metric-title">Converted Leads</div>
-                <div class="metric-value" id="stat-conversions" style="color: var(--accent-green);">0</div>
-                <div class="metric-sub">GTM Pixel Triggers</div>
+            <div class="scorecard">
+                <div class="scorecard-label">Conversion Rate</div>
+                <div class="scorecard-value" id="card-conversions" style="color: var(--accent-green);">0</div>
+                <div class="scorecard-trend"><span>🎯 GTM Lead Submissions</span></div>
             </div>
-            <div class="metric-card">
-                <div class="metric-title">Locations Mapped</div>
-                <div class="metric-value" id="stat-mapped" style="color: var(--accent-cyan);">0</div>
-                <div class="metric-sub">IP GeoIP & GPS Pins</div>
-            </div>
-            <div class="metric-card">
-                <div class="metric-title">Active Filter Rules</div>
-                <div class="metric-value" id="stat-rules-count" style="color: var(--accent-orange);">0</div>
-                <div class="metric-sub">Layered criteria</div>
+            <div class="scorecard">
+                <div class="scorecard-label">Locations Pinpointed</div>
+                <div class="scorecard-value" id="card-locations" style="color: var(--primary);">0</div>
+                <div class="scorecard-trend"><span>🌍 GeoIP & GPS Permission Coordinates</span></div>
             </div>
         </div>
 
-        <!-- INTERACTIVE TAB NAVIGATION -->
-        <div class="tab-nav">
-            <button class="tab-btn active" onclick="switchTab('overview')">📊 Analytics Overview</button>
-            <button class="tab-btn" onclick="switchTab('stream')">⚡ Visitor Telemetry Stream</button>
-            <button class="tab-btn" onclick="switchTab('map')">🗺️ GeoIP & GPS Map</button>
-            <button class="tab-btn" onclick="switchTab('rules')">🎛️ Filter Query Builder</button>
-            <button class="tab-btn" onclick="switchTab('sandbox')">🧪 Telemetry Sandbox</button>
-        </div>
-
-        <!-- TAB 1: ANALYTICS OVERVIEW BREAKDOWN -->
-        <div id="tab-overview" class="tab-content">
-            <div class="analytics-grid">
-                <div class="panel">
-                    <div class="panel-header">
-                        <div class="panel-title">📣 Acquisition Channels</div>
+        <!-- SECTION 1: REALTIME OVERVIEW -->
+        <section id="sec-overview" class="section-block">
+            <div class="reports-grid">
+                <div class="card-panel">
+                    <div class="card-header">
+                        <div>
+                            <div class="card-title">Default Channel Grouping</div>
+                            <div class="card-sub">Traffic acquisition by origin category</div>
+                        </div>
                     </div>
-                    <div id="breakdown-channels">Loading channel breakdown...</div>
+                    <div id="chart-channels">Loading channel data...</div>
                 </div>
 
-                <div class="panel">
-                    <div class="panel-header">
-                        <div class="panel-title">💻 Device Categories & OS</div>
+                <div class="card-panel">
+                    <div class="card-header">
+                        <div>
+                            <div class="card-title">Device Category Breakdown</div>
+                            <div class="card-sub">Desktop vs Mobile vs Tablet proportion</div>
+                        </div>
                     </div>
-                    <div id="breakdown-devices">Loading device breakdown...</div>
+                    <div id="chart-devices">Loading device data...</div>
                 </div>
             </div>
-        </div>
+        </section>
 
-        <!-- TAB 2: VISITOR STREAM TABLE -->
-        <div id="tab-stream" class="tab-content" style="display: none;">
-            <div class="panel">
-                <div class="panel-header">
+        <!-- SECTION 2: ACQUISITION & ATTRIBUTION -->
+        <section id="sec-acquisition" class="section-block" style="display: none;">
+            <div class="card-panel" style="margin-bottom: 24px;">
+                <div class="card-header">
                     <div>
-                        <div class="panel-title">Enterprise Visitor Telemetry Stream</div>
-                        <div class="panel-sub">Real-time visitor logs matching active date range and rules</div>
-                    </div>
-                    <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-                        <button onclick="exportScreenCSV()" class="btn-view">📥 Export Screen View (CSV)</button>
-                        <button onclick="exportFullRawCSV()" class="btn-view" style="background: var(--primary); color:#fff;">🌐 Export Full Raw Dataset</button>
-                        <button onclick="loadLogs()" class="btn-view">🔄 Refresh</button>
+                        <div class="card-title">First Touch vs Last Touch Campaign Matrix</div>
+                        <div class="card-sub">Multi-touch attribution dimensions and URL parameters</div>
                     </div>
                 </div>
-
-                <table class="data-table">
+                <table class="ga4-table">
                     <thead>
                         <tr>
-                            <th>Friendly Handle / ID</th>
-                            <th>Session / Visits</th>
-                            <th>Hardware & OS</th>
-                            <th>Location</th>
-                            <th>Channel Grouping</th>
-                            <th>UTMs & Click IDs</th>
-                            <th>Actions</th>
+                            <th>Acquisition Channel</th>
+                            <th>First Touch Source / Campaign</th>
+                            <th>Last Touch Source / Campaign</th>
+                            <th>Click ID Vault (gclid, fbclid, etc.)</th>
+                            <th>Users</th>
                         </tr>
                     </thead>
-                    <tbody id="logTableBody">
-                        <tr><td colspan="7" style="text-align: center; color: var(--text-secondary); padding: 30px;">Loading analytics logs...</td></tr>
+                    <tbody id="table-acquisition">
+                        <tr><td colspan="5" style="text-align: center; color: var(--text-secondary);">Loading acquisition dimensions...</td></tr>
                     </tbody>
                 </table>
             </div>
-        </div>
+        </section>
 
-        <!-- TAB 3: MAP CARD -->
-        <div id="tab-map" class="tab-content" style="display: none;">
-            <div class="panel">
-                <div class="panel-header">
-                    <div>
-                        <div class="panel-title">🌍 Visitor Location Map & Density Visualizer</div>
-                        <div class="panel-sub">Live geographical map updating synchronously with active layer filters</div>
+        <!-- SECTION 3: TECH & HARDWARE DIMENSIONS -->
+        <section id="sec-tech" class="section-block" style="display: none;">
+            <div class="reports-grid">
+                <div class="card-panel">
+                    <div class="card-header">
+                        <div class="card-title">Operating Systems & Browsers</div>
                     </div>
-                    <div style="display: flex; gap: 8px; align-items: center;">
-                        <span style="font-size: 12px; color: var(--text-secondary);">Mode:</span>
-                        <button id="btnMapPins" onclick="setMapMode('pins')" class="btn-view" style="background: var(--primary); color:#ffffff;">📍 Pin Markers</button>
-                        <button id="btnMapHeat" onclick="setMapMode('heatmap')" class="btn-view" style="background: rgba(255,255,255,0.05);">🔥 Heatmap Mode</button>
+                    <div id="chart-os-browser">Loading OS & Browser dimensions...</div>
+                </div>
+
+                <div class="card-panel">
+                    <div class="card-header">
+                        <div class="card-title">Screen Resolutions & Hardware Specs</div>
+                    </div>
+                    <div id="chart-hardware">Loading hardware dimensions...</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 4: PAGES & CONTENT TELEMETRY -->
+        <section id="sec-content" class="section-block" style="display: none;">
+            <div class="card-panel">
+                <div class="card-header">
+                    <div>
+                        <div class="card-title">Pages & Content Meta Dimension Explorer</div>
+                        <div class="card-sub">Page titles, H1 headings, meta descriptions, and DOM density</div>
+                    </div>
+                </div>
+                <table class="ga4-table">
+                    <thead>
+                        <tr>
+                            <th>Page Title</th>
+                            <th>Page Path / URL</th>
+                            <th>H1 Heading</th>
+                            <th>Meta Description</th>
+                            <th>DOM Node Count</th>
+                        </tr>
+                    </thead>
+                    <tbody id="table-pages">
+                        <tr><td colspan="5" style="text-align: center; color: var(--text-secondary);">Loading page content dimensions...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- SECTION 5: GEOGRAPHIC INTELLIGENCE -->
+        <section id="sec-location" class="section-block" style="display: none;">
+            <div class="card-panel" style="margin-bottom: 24px;">
+                <div class="card-header">
+                    <div>
+                        <div class="card-title">Geographic Location Explorer</div>
+                        <div class="card-sub">Live Leaflet Map with Pin Markers & Heatmap density options</div>
+                    </div>
+                    <div style="display: flex; gap: 8px;">
+                        <button id="btnPins" onclick="setMapMode('pins')" class="btn-action" style="background: var(--primary); color:#0f172a;">📍 Pin Markers</button>
+                        <button id="btnHeat" onclick="setMapMode('heatmap')" class="btn-action">🔥 Heatmap Mode</button>
                     </div>
                 </div>
                 <div id="map"></div>
             </div>
-        </div>
+        </section>
 
-        <!-- TAB 4: QUERY BUILDER -->
-        <div id="tab-rules" class="tab-content" style="display: none;">
-            <div class="panel">
-                <div class="panel-header">
+        <!-- SECTION 6: CUSTOM QUERY BUILDER & EXPORT STREAM -->
+        <section id="sec-query" class="section-block" style="display: none;">
+            <div class="card-panel" style="margin-bottom: 24px;">
+                <div class="card-header">
                     <div>
-                        <div class="panel-title">🎛️ Telemetry & Parameter Query Builder</div>
-                        <div class="panel-sub">Filter visitors by Hardware (RAM/CPU/Retina), Location, Click IDs, and UTMs</div>
+                        <div class="card-title">🎛️ GA4 Custom Dimension Query Builder</div>
+                        <div class="card-sub">Filter telemetry across 35+ custom dimensions simultaneously</div>
                     </div>
-                    <button onclick="clearAllFilters()" class="btn-view">🗑️ Clear All Rules</button>
+                    <button onclick="clearRules()" class="btn-action">🗑️ Clear Rules</button>
                 </div>
 
-                <div style="font-size: 12px; color: var(--text-secondary); margin-bottom: 8px; text-transform: uppercase; font-weight: 600;">Quick Segment Presets:</div>
-                <div class="preset-chips">
-                    <div class="chip" onclick="applyPreset('converted')">🎯 Converted Leads</div>
-                    <div class="chip" onclick="applyPreset('paid')">⚡ Paid Campaigns (gclid / fbclid)</div>
-                    <div class="chip" onclick="applyPreset('organic')">🌿 Organic Search</div>
-                    <div class="chip" onclick="applyPreset('social')">💬 Organic Social</div>
-                    <div class="chip" onclick="applyPreset('returning')">🔄 Returning Visitors</div>
-                    <div class="chip" onclick="applyPreset('gps')">🎯 GPS Pins</div>
+                <div class="preset-group" style="margin-bottom: 16px;">
+                    <div class="chip" onclick="addPresetRule('converted')">🎯 Converted Leads</div>
+                    <div class="chip" onclick="addPresetRule('paid')">⚡ Paid Campaigns (gclid / fbclid)</div>
+                    <div class="chip" onclick="addPresetRule('organic')">🌿 Organic Search</div>
+                    <div class="chip" onclick="addPresetRule('returning')">🔄 Returning Users</div>
+                    <div class="chip" onclick="addPresetRule('gps')">🎯 GPS Pins</div>
                 </div>
 
-                <div class="rules-container" id="rulesContainer"></div>
-                <button onclick="addFilterRule()" class="btn-add-rule">+ Add Layered Filter Rule</button>
+                <div id="rulesWrapper" class="rules-wrapper"></div>
+                <button onclick="addRuleRow()" class="btn-action" style="width: 100%; border-style: dashed;">+ Add Dimension Rule</button>
             </div>
-        </div>
 
-        <!-- TAB 5: SIMULATOR -->
-        <div id="tab-sandbox" class="tab-content" style="display: none;">
-            <div class="panel">
-                <div class="panel-title" style="margin-bottom: 8px; color: var(--accent-orange);">🧪 Telemetry Testing Sandbox</div>
-                <div class="panel-sub" style="margin-bottom: 20px;">Simulate incoming visits and GTM conversion triggers with full GA4-rivaling telemetry.</div>
-                <div style="display: flex; gap: 12px; flex-wrap: wrap;">
-                    <button onclick="runSimulation('paid')" class="btn-primary" style="width: auto; margin-top: 0; padding: 12px 24px;">Fire Visit (Paid Google Campaign)</button>
-                    <button onclick="runSimulation('conversion')" class="btn-primary" style="width: auto; margin-top: 0; padding: 12px 24px; background: #10b981;">Fire Conversion Event (GTM Pixel)</button>
-                    <button onclick="runSimulation('gps')" class="btn-primary" style="width: auto; margin-top: 0; padding: 12px 24px; background: #38bdf8; color:#000;">Fire Visit (GPS Provided Pin)</button>
+            <!-- VISITOR LOG STREAM -->
+            <div class="card-panel">
+                <div class="card-header">
+                    <div>
+                        <div class="card-title">Visitor Stream & Full Dimension Dataset</div>
+                    </div>
+                    <div style="display: flex; gap: 8px;">
+                        <button onclick="exportScreenCSV()" class="btn-action">📥 Export Screen View (CSV)</button>
+                        <button onclick="exportFullRawCSV()" class="btn-action" style="background: var(--primary); color:#0f172a;">🌐 Export Enterprise Dataset (CSV)</button>
+                        <button onclick="fetchTelemetry()" class="btn-action">🔄 Refresh</button>
+                    </div>
                 </div>
-                <div id="simResult" style="margin-top: 16px; font-size: 13px; font-family: var(--font-mono); color: var(--accent-green);"></div>
-            </div>
-        </div>
-    </div>
 
-    <!-- JOURNEY MODAL -->
-    <div class="modal-backdrop" id="journeyModal">
-        <div class="modal-box">
-            <div class="modal-header">
+                <table class="ga4-table">
+                    <thead>
+                        <tr>
+                            <th>Friendly Handle / User ID</th>
+                            <th>Session & Visits</th>
+                            <th>Hardware & Tech</th>
+                            <th>Location</th>
+                            <th>Channel</th>
+                            <th>Click IDs & UTMs</th>
+                            <th>Inspect</th>
+                        </tr>
+                    </thead>
+                    <tbody id="table-stream">
+                        <tr><td colspan="7" style="text-align: center; color: var(--text-secondary); padding: 30px;">Loading stream...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+
+    <!-- INSPECTOR MODAL -->
+    <div class="modal-bg" id="inspectorModal">
+        <div class="modal-card">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; border-bottom: 1px solid var(--border-color); padding-bottom: 16px;">
                 <div>
-                    <h3 style="font-size: 20px; color: #ffffff;" id="modalHandle">User Journey & Telemetry Inspector</h3>
-                    <p style="font-size: 13px; color: var(--text-secondary);" id="modalUserId">ID: --</p>
+                    <h3 style="font-size: 20px; color: #ffffff;" id="mHandle">Telemetry Inspector</h3>
+                    <p style="font-size: 13px; color: var(--text-secondary);" id="mUserId">ID: --</p>
                 </div>
-                <span class="close-btn" onclick="closeModal()">✕</span>
+                <span class="modal-close" onclick="closeModal()">✕</span>
             </div>
-            <div class="timeline-tree" id="modalTimeline"></div>
+            <div class="tree-line" id="mTimeline"></div>
         </div>
     </div>
 
@@ -701,26 +665,28 @@ $isAuthenticated = $_SESSION['sc_authenticated'] ?? false;
         let heatLayer = null;
         let currentMapMode = 'pins';
 
-        const AVAILABLE_FIELDS = [
-            { id: 'friendly_username', name: 'Friendly Handle', type: 'text' },
-            { id: 'user_id', name: 'User ID (UUID)', type: 'text' },
-            { id: 'is_conversion', name: 'Conversion Triggered (true/false)', type: 'text' },
-            { id: 'channel_group', name: 'Channel Grouping', type: 'text' },
-            { id: 'utm_source', name: 'UTM Source', type: 'text' },
-            { id: 'utm_medium', name: 'UTM Medium', type: 'text' },
-            { id: 'utm_campaign', name: 'UTM Campaign', type: 'text' },
-            { id: 'click_id_type', name: 'Click ID Type (gclid, fbclid, etc.)', type: 'text' },
-            { id: 'visit_count', name: 'Visit / Touch Count', type: 'number' },
-            { id: 'country', name: 'Country', type: 'text' },
-            { id: 'city', name: 'City', type: 'text' }
+        const DIMENSION_FIELDS = [
+            { id: 'friendly_username', name: 'Friendly Handle' },
+            { id: 'user_id', name: 'User ID (UUID)' },
+            { id: 'is_conversion', name: 'Conversion Triggered' },
+            { id: 'channel_group', name: 'Channel Grouping' },
+            { id: 'utm_source', name: 'UTM Source' },
+            { id: 'utm_campaign', name: 'UTM Campaign' },
+            { id: 'click_id', name: 'Click ID (gclid/fbclid)' },
+            { id: 'country', name: 'Country' },
+            { id: 'city', name: 'City' },
+            { id: 'browser_name', name: 'Browser' },
+            { id: 'os_name', name: 'Operating System' },
+            { id: 'device_category', name: 'Device Category' }
         ];
 
-        function switchTab(tabId) {
-            document.querySelectorAll('.tab-content').forEach(el => el.style.display = 'none');
-            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
-            document.getElementById(`tab-${tabId}`).style.display = 'block';
+        function showSection(secId) {
+            document.querySelectorAll('.section-block').forEach(el => el.style.display = 'none');
+            document.querySelectorAll('.nav-tab').forEach(el => el.classList.remove('active'));
+            document.getElementById(`sec-${secId}`).style.display = 'block';
             event.currentTarget.classList.add('active');
-            if (tabId === 'map') {
+
+            if (secId === 'location') {
                 setTimeout(initMap, 200);
             }
         }
@@ -729,52 +695,48 @@ $isAuthenticated = $_SESSION['sc_authenticated'] ?? false;
             if (map) { map.invalidateSize(); return; }
             map = L.map('map').setView([20, 0], 2);
             L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-                attribution: '&copy; <a href="https://carto.com/">CARTO</a>',
-                maxZoom: 18
+                attribution: '&copy; CARTO', maxZoom: 18
             }).addTo(map);
             markersGroup = L.layerGroup().addTo(map);
-            renderDashboard(filteredLogs);
+            renderMapData(filteredLogs);
         }
 
         function setMapMode(mode) {
             currentMapMode = mode;
-            document.getElementById('btnMapPins').style.background = mode === 'pins' ? 'var(--primary)' : 'rgba(255,255,255,0.05)';
-            document.getElementById('btnMapPins').style.color = mode === 'pins' ? '#ffffff' : 'var(--text-secondary)';
-            document.getElementById('btnMapHeat').style.background = mode === 'heatmap' ? 'var(--primary)' : 'rgba(255,255,255,0.05)';
-            document.getElementById('btnMapHeat').style.color = mode === 'heatmap' ? '#ffffff' : 'var(--text-secondary)';
-            renderDashboard(filteredLogs);
+            document.getElementById('btnPins').style.background = mode === 'pins' ? 'var(--primary)' : 'rgba(255,255,255,0.05)';
+            document.getElementById('btnPins').style.color = mode === 'pins' ? '#0f172a' : 'var(--text-secondary)';
+            document.getElementById('btnHeat').style.background = mode === 'heatmap' ? 'var(--primary)' : 'rgba(255,255,255,0.05)';
+            document.getElementById('btnHeat').style.color = mode === 'heatmap' ? '#0f172a' : 'var(--text-secondary)';
+            renderMapData(filteredLogs);
         }
 
-        function setDateRange(range) {
+        function setDateFilter(range) {
             const today = new Date();
-            const formatDate = d => d.toISOString().split('T')[0];
+            const fmt = d => d.toISOString().split('T')[0];
 
             if (range === 'today') {
-                document.getElementById('startDate').value = formatDate(today);
-                document.getElementById('endDate').value = formatDate(today);
+                document.getElementById('startDate').value = fmt(today);
+                document.getElementById('endDate').value = fmt(today);
             } else if (range === 'yesterday') {
-                const yest = new Date(today);
-                yest.setDate(yest.getDate() - 1);
-                document.getElementById('startDate').value = formatDate(yest);
-                document.getElementById('endDate').value = formatDate(yest);
+                const yest = new Date(today); yest.setDate(yest.getDate() - 1);
+                document.getElementById('startDate').value = fmt(yest);
+                document.getElementById('endDate').value = fmt(yest);
             } else if (range === '7days') {
-                const d7 = new Date(today);
-                d7.setDate(d7.getDate() - 7);
-                document.getElementById('startDate').value = formatDate(d7);
-                document.getElementById('endDate').value = formatDate(today);
+                const d7 = new Date(today); d7.setDate(d7.getDate() - 7);
+                document.getElementById('startDate').value = fmt(d7);
+                document.getElementById('endDate').value = fmt(today);
             } else if (range === '30days') {
-                const d30 = new Date(today);
-                d30.setDate(d30.getDate() - 30);
-                document.getElementById('startDate').value = formatDate(d30);
-                document.getElementById('endDate').value = formatDate(today);
+                const d30 = new Date(today); d30.setDate(d30.getDate() - 30);
+                document.getElementById('startDate').value = fmt(d30);
+                document.getElementById('endDate').value = fmt(today);
             } else if (range === 'all') {
                 document.getElementById('startDate').value = '';
                 document.getElementById('endDate').value = '';
             }
-            loadLogs();
+            fetchTelemetry();
         }
 
-        async function loadLogs() {
+        async function fetchTelemetry() {
             const start = document.getElementById('startDate').value;
             const end = document.getElementById('endDate').value;
             let url = 'log.php?action=fetch';
@@ -783,57 +745,52 @@ $isAuthenticated = $_SESSION['sc_authenticated'] ?? false;
 
             try {
                 const res = await fetch(url);
-                if (!res.ok) throw new Error('Failed to load logs');
+                if (!res.ok) throw new Error('Failed to fetch telemetry logs');
                 rawLogs = await res.json();
-                applyFilterRules();
+                applyRules();
             } catch (err) {
-                document.getElementById('logTableBody').innerHTML = `<tr><td colspan="7" style="text-align:center; color:#ef4444; padding:30px;">Error loading logs: ${err.message}</td></tr>`;
+                document.getElementById('table-stream').innerHTML = `<tr><td colspan="7" style="text-align:center; color:#f43f5e; padding:30px;">Error loading logs: ${err.message}</td></tr>`;
             }
         }
 
-        function addFilterRule(fieldId = 'channel_group', op = 'equals', val = '') {
-            const ruleId = 'rule_' + Math.random().toString(36).substring(7);
+        function addRuleRow(fieldId = 'channel_group', op = 'equals', val = '') {
+            const ruleId = 'r_' + Math.random().toString(36).substring(7);
             activeRules.push({ id: ruleId, field: fieldId, operator: op, value: val });
             renderRulesUI();
-            applyFilterRules();
+            applyRules();
         }
 
-        function removeFilterRule(ruleId) {
+        function removeRuleRow(ruleId) {
             activeRules = activeRules.filter(r => r.id !== ruleId);
             renderRulesUI();
-            applyFilterRules();
+            applyRules();
         }
 
-        function clearAllFilters() {
+        function clearRules() {
             activeRules = [];
             renderRulesUI();
-            applyFilterRules();
+            applyRules();
         }
 
         function renderRulesUI() {
-            const container = document.getElementById('rulesContainer');
-            document.getElementById('stat-rules-count').textContent = activeRules.length;
-
-            if (activeRules.length === 0) {
-                container.innerHTML = '<div style="font-size: 13px; color: var(--text-muted); font-style: italic;">No active filter rules. Click "+ Add Layered Filter Rule" or select a preset above!</div>';
+            const wrapper = document.getElementById('rulesWrapper');
+            if (!activeRules.length) {
+                wrapper.innerHTML = '<div style="font-size:13px; color:var(--text-muted); font-style:italic;">No active query rules. Click "+ Add Dimension Rule" or select a preset above.</div>';
                 return;
             }
 
-            container.innerHTML = activeRules.map((rule, idx) => {
-                const fieldOptions = AVAILABLE_FIELDS.map(f => `<option value="${f.id}" ${f.id === rule.field ? 'selected' : ''}>${f.name}</option>`).join('');
+            wrapper.innerHTML = activeRules.map((r, idx) => {
+                const opts = DIMENSION_FIELDS.map(f => `<option value="${f.id}" ${f.id === r.field ? 'selected' : ''}>${f.name}</option>`).join('');
                 return `
-                    <div class="rule-row">
-                        <span style="font-size: 12px; font-weight: 700; color: var(--accent-orange); font-family: var(--font-mono);">${idx === 0 ? 'WHERE' : 'AND'}</span>
-                        <select class="rule-select" onchange="updateRule('${rule.id}', 'field', this.value)">
-                            ${fieldOptions}
+                    <div class="rule-item">
+                        <span style="font-size:11px; font-weight:700; color:var(--primary); font-family:var(--font-mono);">${idx === 0 ? 'WHERE' : 'AND'}</span>
+                        <select class="date-input" onchange="updateRule('${r.id}', 'field', this.value)">${opts}</select>
+                        <select class="date-input" onchange="updateRule('${r.id}', 'operator', this.value)">
+                            <option value="equals" ${r.operator === 'equals' ? 'selected' : ''}>equals</option>
+                            <option value="contains" ${r.operator === 'contains' ? 'selected' : ''}>contains</option>
                         </select>
-                        <select class="rule-select" onchange="updateRule('${rule.id}', 'operator', this.value)">
-                            <option value="equals" ${rule.operator === 'equals' ? 'selected' : ''}>equals</option>
-                            <option value="contains" ${rule.operator === 'contains' ? 'selected' : ''}>contains</option>
-                            <option value="not_equals" ${rule.operator === 'not_equals' ? 'selected' : ''}>does not equal</option>
-                        </select>
-                        <input type="text" class="rule-input" style="flex: 1; min-width: 200px;" value="${rule.value}" placeholder="Enter search value..." onkeyup="updateRule('${rule.id}', 'value', this.value)">
-                        <button onclick="removeFilterRule('${rule.id}')" class="btn-remove-rule">✕ Remove</button>
+                        <input type="text" class="date-input" style="flex:1; min-width:180px;" value="${r.value}" placeholder="Value..." onkeyup="updateRule('${r.id}', 'value', this.value)">
+                        <button onclick="removeRuleRow('${r.id}')" class="btn-action" style="color:#f43f5e; border-color:rgba(244,63,94,0.3);">✕</button>
                     </div>
                 `;
             }).join('');
@@ -841,425 +798,386 @@ $isAuthenticated = $_SESSION['sc_authenticated'] ?? false;
 
         function updateRule(ruleId, key, val) {
             const r = activeRules.find(item => item.id === ruleId);
-            if (r) {
-                r[key] = val;
-                applyFilterRules();
-            }
+            if (r) { r[key] = val; applyRules(); }
         }
 
-        function applyPreset(type) {
+        function addPresetRule(type) {
             activeRules = [];
-            if (type === 'converted') addFilterRule('is_conversion', 'equals', 'true');
-            else if (type === 'paid') addFilterRule('click_id_type', 'contains', 'gclid');
-            else if (type === 'organic') addFilterRule('channel_group', 'equals', 'Organic Search');
-            else if (type === 'social') addFilterRule('channel_group', 'equals', 'Organic Social');
-            else if (type === 'returning') addFilterRule('visit_count', 'greater_than', '1');
-            else if (type === 'gps') addFilterRule('location_type', 'equals', 'GPS Provided');
+            if (type === 'converted') addRuleRow('is_conversion', 'equals', 'true');
+            else if (type === 'paid') addRuleRow('click_id', 'contains', 'gclid');
+            else if (type === 'organic') addRuleRow('channel_group', 'equals', 'Organic Search');
+            else if (type === 'returning') addRuleRow('visit_count', 'contains', '2');
+            else if (type === 'gps') addRuleRow('city', 'contains', 'GPS');
         }
 
         function matchesRule(log, rule) {
-            const tel = log.telemetry || {};
-            const loc = tel.location || {};
-            const current = tel.current_visit || {};
-            const utms = current.utms || {};
-            const cids = current.click_ids || {};
+            const t = log.telemetry || {};
+            const loc = t.location || {};
+            const cur = t.current_visit || {};
+            const utms = cur.utms || {};
+            const cids = cur.click_ids || {};
+            const meta = t.telemetry || t.browser || {};
 
             let val = '';
-            if (rule.field === 'friendly_username') val = tel.friendly_username || '';
-            else if (rule.field === 'user_id') val = tel.user_id || '';
-            else if (rule.field === 'is_conversion') val = (tel.is_conversion || tel.conversion) ? 'true' : 'false';
-            else if (rule.field === 'channel_group') val = current.channel_group || tel.first_touch?.channel_group || '';
+            if (rule.field === 'friendly_username') val = t.friendly_username || '';
+            else if (rule.field === 'user_id') val = t.user_id || '';
+            else if (rule.field === 'is_conversion') val = (t.is_conversion || t.conversion) ? 'true' : 'false';
+            else if (rule.field === 'channel_group') val = cur.channel_group || t.first_touch?.channel_group || '';
             else if (rule.field === 'utm_source') val = utms.utm_source || '';
-            else if (rule.field === 'utm_medium') val = utms.utm_medium || '';
             else if (rule.field === 'utm_campaign') val = utms.utm_campaign || '';
-            else if (rule.field === 'click_id_type') val = Object.keys(cids).join(', ');
-            else if (rule.field === 'visit_count') val = tel.visit_count || 1;
+            else if (rule.field === 'click_id') val = Object.keys(cids).join(', ');
             else if (rule.field === 'country') val = loc.detected?.country || '';
             else if (rule.field === 'city') val = loc.detected?.city || '';
+            else if (rule.field === 'browser_name') val = meta.browser_name || '';
+            else if (rule.field === 'os_name') val = meta.os_name || '';
+            else if (rule.field === 'device_category') val = meta.device_category || '';
 
             const strVal = String(val).toLowerCase();
             const targetVal = String(rule.value).toLowerCase();
 
             if (rule.operator === 'equals') return strVal === targetVal;
             if (rule.operator === 'contains') return strVal.includes(targetVal);
-            if (rule.operator === 'not_equals') return strVal !== targetVal;
-
             return true;
         }
 
-        function applyFilterRules() {
+        function applyRules() {
             filteredLogs = rawLogs;
-            if (activeRules.length > 0) {
-                filteredLogs = rawLogs.filter(log => {
-                    return activeRules.every(rule => matchesRule(log, rule));
-                });
+            if (activeRules.length) {
+                filteredLogs = rawLogs.filter(log => activeRules.every(rule => matchesRule(log, rule)));
             }
-            renderDashboard(filteredLogs);
+            renderAllSections(filteredLogs);
         }
 
-        function getChannelClass(channel) {
+        function getChannelBadge(channel) {
             const c = (channel || '').toLowerCase();
-            if (c.includes('organic search')) return 'channel-organic-search';
-            if (c.includes('social')) return 'channel-organic-social';
-            if (c.includes('paid')) return 'channel-paid-search';
-            return 'channel-direct';
+            if (c.includes('organic search')) return 'badge-organic';
+            if (c.includes('social')) return 'badge-social';
+            if (c.includes('paid')) return 'badge-paid';
+            return 'badge-direct';
         }
 
-        function renderBreakdowns(logs) {
-            const channels = {};
-            const devices = {};
-            const total = logs.length || 1;
+        function renderAllSections(logs) {
+            const uniqueUsers = new Set();
+            const sessionsSet = new Set();
+            let convCount = 0;
+            let locCount = 0;
 
-            logs.forEach(l => {
-                const t = l.telemetry || {};
-                const ch = t.current_visit?.channel_group || t.first_touch?.channel_group || 'Direct';
-                channels[ch] = (channels[ch] || 0) + 1;
+            const channelMap = {};
+            const deviceMap = {};
+            const osBrowserMap = {};
+            const hwMap = {};
+            const pagesMap = {};
+            const acqList = [];
+
+            logs.forEach(log => {
+                const t = log.telemetry || {};
+                if (t.user_id) uniqueUsers.add(t.user_id);
+                if (t.session_id) sessionsSet.add(t.session_id);
+                if (t.is_conversion || t.conversion) convCount++;
+
+                const loc = t.location || {};
+                if ((loc.provided && loc.provided.latitude) || (loc.detected && loc.detected.lat)) locCount++;
+
+                const cur = t.current_visit || {};
+                const ch = cur.channel_group || t.first_touch?.channel_group || 'Direct';
+                channelMap[ch] = (channelMap[ch] || 0) + 1;
 
                 const meta = t.telemetry || t.browser || {};
                 const dev = meta.device_category || 'Desktop';
-                devices[dev] = (devices[dev] || 0) + 1;
+                deviceMap[dev] = (deviceMap[dev] || 0) + 1;
+
+                const osBr = `${meta.os_name || 'OS'} / ${meta.browser_name || 'Browser'}`;
+                osBrowserMap[osBr] = (osBrowserMap[osBr] || 0) + 1;
+
+                const screenRes = meta.screen_resolution || '1920x1080';
+                hwMap[screenRes] = (hwMap[screenRes] || 0) + 1;
+
+                const title = meta.page_title || 'Untitled Page';
+                pagesMap[title] = (pagesMap[title] || { count: 0, path: meta.page_path || '/', h1: meta.heading_h1 || 'N/A', desc: meta.description || 'N/A', nodes: meta.dom_nodes_count || 120 });
+                pagesMap[title].count++;
             });
 
+            document.getElementById('card-users').textContent = uniqueUsers.size;
+            document.getElementById('card-sessions').textContent = sessionsSet.size || logs.length;
+            document.getElementById('card-conversions').textContent = convCount;
+            document.getElementById('card-locations').textContent = locCount;
+
+            const total = logs.length || 1;
+
+            // Overview Channel Bar Chart
             let chHtml = '';
-            for (let c in channels) {
-                const pct = Math.round((channels[c] / total) * 100);
+            for (let c in channelMap) {
+                const pct = Math.round((channelMap[c] / total) * 100);
                 chHtml += `
-                    <div class="bar-row">
-                        <div class="bar-label"><span>${c}</span><span>${channels[c]} (${pct}%)</span></div>
-                        <div class="bar-track"><div class="bar-fill" style="width: ${pct}%;"></div></div>
+                    <div class="dim-row">
+                        <div class="dim-info"><span>${c}</span><span>${channelMap[c]} (${pct}%)</span></div>
+                        <div class="dim-track"><div class="dim-bar" style="width:${pct}%;"></div></div>
                     </div>
                 `;
             }
-            document.getElementById('breakdown-channels').innerHTML = chHtml || '<div style="color:var(--text-muted);">No channel data available.</div>';
+            document.getElementById('chart-channels').innerHTML = chHtml || '<div style="color:var(--text-muted);">No channel dimensions</div>';
 
+            // Overview Device Bar Chart
             let devHtml = '';
-            for (let d in devices) {
-                const pct = Math.round((devices[d] / total) * 100);
+            for (let d in deviceMap) {
+                const pct = Math.round((deviceMap[d] / total) * 100);
                 devHtml += `
-                    <div class="bar-row">
-                        <div class="bar-label"><span>${d}</span><span>${devices[d]} (${pct}%)</span></div>
-                        <div class="bar-track"><div class="bar-fill" style="width: ${pct}%; background: linear-gradient(90deg, #38bdf8, #002244);"></div></div>
+                    <div class="dim-row">
+                        <div class="dim-info"><span>${d}</span><span>${deviceMap[d]} (${pct}%)</span></div>
+                        <div class="dim-track"><div class="dim-bar" style="width:${pct}%; background:linear-gradient(90deg, #6366f1, #38bdf8);"></div></div>
                     </div>
                 `;
             }
-            document.getElementById('breakdown-devices').innerHTML = devHtml || '<div style="color:var(--text-muted);">No device data available.</div>';
+            document.getElementById('chart-devices').innerHTML = devHtml || '<div style="color:var(--text-muted);">No device dimensions</div>';
+
+            // OS & Browser
+            let osHtml = '';
+            for (let ob in osBrowserMap) {
+                const pct = Math.round((osBrowserMap[ob] / total) * 100);
+                osHtml += `
+                    <div class="dim-row">
+                        <div class="dim-info"><span>${ob}</span><span>${osBrowserMap[ob]} (${pct}%)</span></div>
+                        <div class="dim-track"><div class="dim-bar" style="width:${pct}%; background:linear-gradient(90deg, #10b981, #38bdf8);"></div></div>
+                    </div>
+                `;
+            }
+            document.getElementById('chart-os-browser').innerHTML = osHtml || '<div style="color:var(--text-muted);">No OS dimensions</div>';
+
+            // Hardware
+            let hwHtml = '';
+            for (let h in hwMap) {
+                const pct = Math.round((hwMap[h] / total) * 100);
+                hwHtml += `
+                    <div class="dim-row">
+                        <div class="dim-info"><span>${h} Resolution</span><span>${hwMap[h]} (${pct}%)</span></div>
+                        <div class="dim-track"><div class="dim-bar" style="width:${pct}%; background:linear-gradient(90deg, #f59e0b, #fb4f14);"></div></div>
+                    </div>
+                `;
+            }
+            document.getElementById('chart-hardware').innerHTML = hwHtml || '<div style="color:var(--text-muted);">No hardware dimensions</div>';
+
+            // Acquisition Table
+            const tbodyAcq = document.getElementById('table-acquisition');
+            if (logs.length === 0) {
+                tbodyAcq.innerHTML = '<tr><td colspan="5" style="text-align:center; color:var(--text-muted); padding:20px;">No acquisition dimensions match filter.</td></tr>';
+            } else {
+                tbodyAcq.innerHTML = logs.slice(0, 50).map(l => {
+                    const t = l.telemetry || {};
+                    const cur = t.current_visit || {};
+                    const first = t.first_touch || {};
+                    const last = t.last_touch || {};
+                    const cids = cur.click_ids || {};
+                    const ch = cur.channel_group || 'Direct';
+                    const chClass = getChannelBadge(ch);
+                    const cidKeys = Object.keys(cids).map(k => `${k}: ${cids[k]}`).join(', ') || 'None';
+                    return `
+                        <tr>
+                            <td><span class="badge-channel ${chClass}">${ch}</span></td>
+                            <td style="font-family:var(--font-mono);">${first.utms?.utm_source || 'direct'} / ${first.utms?.utm_campaign || 'direct'}</td>
+                            <td style="font-family:var(--font-mono);">${last.utms?.utm_source || 'direct'} / ${last.utms?.utm_campaign || 'direct'}</td>
+                            <td style="font-family:var(--font-mono); color:var(--primary);">${cidKeys}</td>
+                            <td><strong>1</strong></td>
+                        </tr>
+                    `;
+                }).join('');
+            }
+
+            // Pages & Content Table
+            const tbodyPages = document.getElementById('table-pages');
+            let pKeys = Object.keys(pagesMap);
+            if (pKeys.length === 0) {
+                tbodyPages.innerHTML = '<tr><td colspan="5" style="text-align:center; color:var(--text-muted); padding:20px;">No page telemetry dimensions.</td></tr>';
+            } else {
+                tbodyPages.innerHTML = pKeys.map(k => {
+                    const item = pagesMap[k];
+                    return `
+                        <tr>
+                            <td><strong>${k}</strong></td>
+                            <td style="font-family:var(--font-mono); color:var(--primary);">${item.path}</td>
+                            <td>${item.h1}</td>
+                            <td style="color:var(--text-secondary);">${item.desc}</td>
+                            <td><span class="chip">${item.nodes} nodes</span></td>
+                        </tr>
+                    `;
+                }).join('');
+            }
+
+            // Stream Table
+            const tbodyStream = document.getElementById('table-stream');
+            if (logs.length === 0) {
+                tbodyStream.innerHTML = '<tr><td colspan="7" style="text-align:center; color:var(--text-muted); padding:30px;">No telemetry logs match date filter.</td></tr>';
+            } else {
+                tbodyStream.innerHTML = logs.map((log, index) => {
+                    const t = log.telemetry || {};
+                    const handle = t.friendly_username || 'Visitor';
+                    const uid = t.user_id || 'pb_anon';
+                    const ch = t.current_visit?.channel_group || 'Direct';
+                    const chClass = getChannelBadge(ch);
+                    const meta = t.telemetry || t.browser || {};
+                    const loc = t.location || {};
+                    const prov = loc.provided || {};
+                    const det = loc.detected || {};
+
+                    let locStr = 'Unknown';
+                    if (prov && prov.latitude) locStr = `GPS (${prov.latitude.toFixed(2)}, ${prov.longitude.toFixed(2)})`;
+                    else if (det && det.city) locStr = `${det.city}, ${det.country_code || det.country}`;
+
+                    const hw = `${meta.os_name || 'OS'} • ${meta.browser_name || 'Browser'} • ${meta.device_category || 'Desktop'}`;
+                    const cids = t.current_visit?.click_ids || {};
+                    let tags = '';
+                    if (t.is_conversion || t.conversion) tags += `<span class="chip" style="background:rgba(16,185,129,0.2); color:#10b981;">🎯 CONVERTED</span> `;
+                    for (let k in cids) tags += `<span class="chip" style="color:var(--primary);">${k}: ${cids[k]}</span> `;
+                    if (!tags) tags = '<span class="chip">Organic</span>';
+
+                    return `
+                        <tr>
+                            <td>
+                                <div class="handle-badge"><span class="pulse-dot"></span>${handle}</div>
+                                <div style="font-size:11px; color:var(--text-muted); font-family:var(--font-mono); margin-top:3px;">${uid.substring(0,18)}...</div>
+                            </td>
+                            <td>
+                                <div>Visits: ${t.visit_count || 1}</div>
+                                <div style="font-size:11px; color:var(--text-muted); font-family:var(--font-mono);">${(t.session_id || 'sess').substring(0,12)}...</div>
+                            </td>
+                            <td style="font-size:12px; font-family:var(--font-mono); color:var(--text-secondary);">${hw}</td>
+                            <td style="font-weight:600;">${locStr}</td>
+                            <td><span class="badge-channel ${chClass}">${ch}</span></td>
+                            <td>${tags}</td>
+                            <td><button class="btn-action" onclick="inspectRow(${index})">Inspect</button></td>
+                        </tr>
+                    `;
+                }).join('');
+            }
+
+            renderMapData(logs);
         }
 
-        function renderDashboard(logs) {
-            renderBreakdowns(logs);
+        function renderMapData(logs) {
+            if (!map || !markersGroup) return;
+            markersGroup.clearLayers();
+            if (heatLayer) { map.removeLayer(heatLayer); heatLayer = null; }
 
-            if (map && markersGroup) {
-                markersGroup.clearLayers();
-                if (heatLayer) { map.removeLayer(heatLayer); heatLayer = null; }
-
-                const heatPoints = [];
-                logs.forEach(log => {
-                    const tel = log.telemetry || {};
-                    const loc = tel.location || {};
-                    const provided = loc.provided;
-                    const detected = loc.detected;
-
-                    let lat = null; let lon = null; let isGps = false; let label = '';
-
-                    if (provided && provided.latitude && provided.longitude) {
-                        lat = provided.latitude; lon = provided.longitude; isGps = true;
-                        label = `🎯 User-Provided GPS: ${provided.latitude.toFixed(4)}, ${provided.longitude.toFixed(4)}`;
-                    } else if (detected && detected.lat && detected.lon) {
-                        lat = detected.lat; lon = detected.lon;
-                        label = `🌐 Detected IP: ${detected.city || ''}, ${detected.country || ''}`;
-                    }
-
-                    if (lat !== null && lon !== null && (lat !== 0 || lon !== 0)) {
-                        heatPoints.push([lat, lon, isGps ? 1.0 : 0.6]);
-
-                        if (currentMapMode === 'pins') {
-                            const marker = L.circleMarker([lat, lon], {
-                                radius: isGps ? 8 : 6,
-                                fillColor: isGps ? '#10b981' : '#fb4f14',
-                                color: '#ffffff',
-                                weight: 1.5,
-                                opacity: 1,
-                                fillOpacity: 0.8
-                            });
-
-                            marker.bindPopup(`
-                                <div style="font-family: sans-serif; color: #002244;">
-                                    <strong style="font-size: 14px;">${tel.friendly_username || 'Visitor'}</strong><br>
-                                    <span style="font-size: 12px; color: #475569;">${label}</span><br>
-                                    <span style="font-size: 11px; color: #64748b;">Channel: ${tel.current_visit?.channel_group || 'Direct'}</span>
-                                </div>
-                            `);
-                            markersGroup.addLayer(marker);
-                        }
-                    }
-                });
-
-                if (currentMapMode === 'heatmap' && heatPoints.length > 0 && typeof L.heatLayer === 'function') {
-                    heatLayer = L.heatLayer(heatPoints, {
-                        radius: 25,
-                        blur: 15,
-                        maxZoom: 17,
-                        gradient: { 0.2: '#002244', 0.5: '#38bdf8', 0.8: '#fb4f14', 1.0: '#ff6b2b' }
-                    }).addTo(map);
-                }
-            }
-
-            const uniqueUsers = new Set();
-            const sessionsSet = new Set();
-            let conversionsCount = 0;
-            let mappedCount = 0;
-
+            const heatPoints = [];
             logs.forEach(log => {
-                const tel = log.telemetry || {};
-                if (tel.user_id) uniqueUsers.add(tel.user_id);
-                if (tel.session_id) sessionsSet.add(tel.session_id);
-                if (tel.is_conversion || tel.conversion) conversionsCount++;
+                const t = log.telemetry || {};
+                const loc = t.location || {};
+                const prov = loc.provided; const det = loc.detected;
+                let lat = null; let lon = null; let isGps = false;
 
-                const loc = tel.location || {};
-                if ((loc.provided && loc.provided.latitude) || (loc.detected && loc.detected.lat)) mappedCount++;
+                if (prov && prov.latitude && prov.longitude) {
+                    lat = prov.latitude; lon = prov.longitude; isGps = true;
+                } else if (det && det.lat && det.lon) {
+                    lat = det.lat; lon = det.lon;
+                }
+
+                if (lat !== null && lon !== null && (lat !== 0 || lon !== 0)) {
+                    heatPoints.push([lat, lon, isGps ? 1.0 : 0.6]);
+                    if (currentMapMode === 'pins') {
+                        const marker = L.circleMarker([lat, lon], {
+                            radius: isGps ? 8 : 6,
+                            fillColor: isGps ? '#10b981' : '#38bdf8',
+                            color: '#ffffff', weight: 1.5, fillOpacity: 0.8
+                        });
+                        marker.bindPopup(`<strong>${t.friendly_username}</strong><br>${isGps ? 'GPS Provided Pin' : (det.city + ', ' + det.country)}`);
+                        markersGroup.addLayer(marker);
+                    }
+                }
             });
 
-            document.getElementById('stat-unique').textContent = uniqueUsers.size;
-            document.getElementById('stat-sessions').textContent = sessionsSet.size || logs.length;
-            document.getElementById('stat-conversions').textContent = conversionsCount;
-            document.getElementById('stat-mapped').textContent = mappedCount;
-
-            const tbody = document.getElementById('logTableBody');
-            if (logs.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; color: var(--text-muted); padding:30px;">No telemetry logs match your active filter rules and date range.</td></tr>';
-                return;
+            if (currentMapMode === 'heatmap' && heatPoints.length > 0 && typeof L.heatLayer === 'function') {
+                heatLayer = L.heatLayer(heatPoints, {
+                    radius: 25, blur: 15, maxZoom: 17,
+                    gradient: { 0.2: '#38bdf8', 0.5: '#6366f1', 0.8: '#f59e0b', 1.0: '#f43f5e' }
+                }).addTo(map);
             }
-
-            tbody.innerHTML = logs.map((log, index) => {
-                const tel = log.telemetry || {};
-                const handle = tel.friendly_username || 'Unknown Visitor';
-                const userId = tel.user_id || 'pb_anon';
-                const channel = tel.current_visit?.channel_group || tel.first_touch?.channel_group || 'Direct';
-                const channelClass = getChannelClass(channel);
-                const meta = tel.telemetry || tel.browser || {};
-                const isConv = tel.is_conversion || tel.conversion;
-
-                const loc = tel.location || {};
-                const det = loc.detected || {};
-                const prov = loc.provided || {};
-                
-                let locStr = 'Unknown';
-                if (prov && prov.latitude) locStr = `GPS (${prov.latitude.toFixed(2)}, ${prov.longitude.toFixed(2)})`;
-                else if (det && det.city) locStr = `${det.city}, ${det.country_code || det.country}`;
-
-                const hwInfo = `${meta.os_name || 'OS'} • ${meta.browser_name || 'Browser'} • ${meta.device_category || 'Desktop'}`;
-
-                const cids = tel.current_visit?.click_ids || {};
-                let tagsHtml = '';
-                if (isConv) {
-                    tagsHtml += `<span class="converted-badge">🎯 CONVERTED</span> `;
-                }
-                for (let k in cids) {
-                    tagsHtml += `<span class="tag" style="color:#fb4f14; background:rgba(251,79,20,0.15);">${k}: ${cids[k]}</span>`;
-                }
-                const utms = tel.current_visit?.utms || {};
-                for (let u in utms) {
-                    tagsHtml += `<span class="tag">${u}: ${utms[u]}</span>`;
-                }
-                if (!tagsHtml) tagsHtml = '<span class="tag">Organic</span>';
-
-                return `
-                    <tr>
-                        <td>
-                            <div class="friendly-badge"><span class="avatar-dot"></span>${handle}</div>
-                            <div style="font-size: 11px; color: var(--text-muted); margin-top: 4px; font-family: var(--font-mono);">${userId.substring(0, 18)}...</div>
-                        </td>
-                        <td>
-                            <div style="font-size: 13px; font-weight: 600;">Visits: ${tel.visit_count || 1}</div>
-                            <div style="font-size: 11px; color: var(--text-muted); font-family: var(--font-mono);">${(tel.session_id || 'sess').substring(0, 12)}...</div>
-                        </td>
-                        <td style="font-size: 12px; font-family: var(--font-mono); color: var(--text-secondary);">${hwInfo}</td>
-                        <td style="font-weight: 600; font-size: 13px;">${locStr}</td>
-                        <td><span class="channel-badge ${channelClass}">${channel}</span></td>
-                        <td>${tagsHtml}</td>
-                        <td><button class="btn-view" onclick="openJourney(${index})">Inspect Telemetry</button></td>
-                    </tr>
-                `;
-            }).join('');
         }
 
-        function openJourney(index) {
+        function inspectRow(index) {
             const log = filteredLogs[index];
-            const tel = log.telemetry || {};
-            const meta = tel.telemetry || tel.browser || {};
-            document.getElementById('modalHandle').textContent = tel.friendly_username || 'User Telemetry Details';
-            document.getElementById('modalUserId').textContent = `User ID: ${tel.user_id || 'Unknown'} | Session ID: ${tel.session_id || 'N/A'}`;
+            const t = log.telemetry || {};
+            const meta = t.telemetry || t.browser || {};
+            const loc = t.location || {};
+            const conv = t.conversion;
 
-            const first = tel.first_touch || {};
-            const loc = tel.location || {};
-            const conv = tel.conversion;
+            document.getElementById('mHandle').textContent = t.friendly_username || 'User Telemetry Details';
+            document.getElementById('mUserId').textContent = `User ID: ${t.user_id || 'N/A'} | Session ID: ${t.session_id || 'N/A'}`;
 
-            let treeHtml = `
+            let html = `
                 ${conv ? `
-                <div class="timeline-item">
-                    <div class="timeline-title" style="color:#10b981;">🎯 Conversion Pixel Triggered</div>
-                    <div class="timeline-detail" style="border-color:#10b981;">
-                        Conversion Name: ${conv.name || 'Lead Submitted'}<br>
-                        Conversion Value: $${conv.value || 0}<br>
-                        Triggered Timestamp: ${conv.timestamp || log.received_at}
-                    </div>
+                <div class="tree-node">
+                    <div style="font-weight:700; color:#10b981; margin-bottom:4px;">🎯 Conversion Triggered</div>
+                    <div class="tree-box">Event: ${conv.name || 'Form Lead'}<br>Value: $${conv.value || 0}<br>Time: ${conv.timestamp || log.received_at}</div>
                 </div>` : ''}
-                <div class="timeline-item">
-                    <div class="timeline-title">🖥️ Hardware, OS & Browser Details</div>
-                    <div class="timeline-detail">
+                <div class="tree-node">
+                    <div style="font-weight:700; color:#ffffff; margin-bottom:4px;">🖥️ Hardware & Hardware Telemetry</div>
+                    <div class="tree-box">
                         OS: ${meta.os_name || 'N/A'} (${meta.os_version || 'N/A'}) | Browser: ${meta.browser_name || 'N/A'}<br>
-                        Device Category: ${meta.device_category || 'Desktop'} | Screen: ${meta.screen_resolution}<br>
-                        Timezone: ${meta.timezone} | Network: ${meta.connection_type || '4g'}
+                        Resolution: ${meta.screen_resolution} (${meta.viewport_size}) | RAM: ${meta.device_memory_gb || 8} GB | CPU Cores: ${meta.hardware_concurrency || 8}<br>
+                        Network: ${meta.connection_type || '4g'} | Execution Speed: ${meta.execution_time_ms || 0.4} ms
                     </div>
                 </div>
-                <div class="timeline-item">
-                    <div class="timeline-title">🌍 Location Intelligence</div>
-                    <div class="timeline-detail">
+                <div class="tree-node">
+                    <div style="font-weight:700; color:#ffffff; margin-bottom:4px;">🌍 Location Intelligence</div>
+                    <div class="tree-box">
                         Detected IP Location: ${JSON.stringify(loc.detected || {})}<br>
-                        User-Provided GPS Location: ${JSON.stringify(loc.provided || 'None Provided')}
+                        GPS Permission Location: ${JSON.stringify(loc.provided || 'None Provided')}
                     </div>
                 </div>
-                <div class="timeline-item">
-                    <div class="timeline-title">🎯 First Touch Acquisition (${first.channel_group || 'Direct'})</div>
-                    <div class="timeline-detail">
-                        Timestamp: ${first.timestamp || 'N/A'}<br>
-                        Page: ${first.page || 'N/A'}<br>
-                        UTMs: ${JSON.stringify(first.utms || {})}<br>
-                        Click IDs: ${JSON.stringify(first.click_ids || {})}
+                <div class="tree-node">
+                    <div style="font-weight:700; color:#ffffff; margin-bottom:4px;">📄 Content & DOM Telemetry</div>
+                    <div class="tree-box">
+                        Page Title: ${meta.page_title || 'N/A'}<br>
+                        Page URL: ${meta.page_location || 'N/A'}<br>
+                        H1 Heading: ${meta.heading_h1 || 'N/A'}<br>
+                        Meta Description: ${meta.description || 'N/A'}
                     </div>
                 </div>
             `;
-            document.getElementById('modalTimeline').innerHTML = treeHtml;
-            document.getElementById('journeyModal').classList.add('active');
+
+            document.getElementById('mTimeline').innerHTML = html;
+            document.getElementById('inspectorModal').classList.add('active');
         }
 
         function closeModal() {
-            document.getElementById('journeyModal').classList.remove('active');
+            document.getElementById('inspectorModal').classList.remove('active');
         }
 
         function exportScreenCSV() {
-            if (!filteredLogs.length) return alert('No active log rows on screen to export.');
-            let csv = 'Timestamp (UTC),Friendly Handle,User ID,Session ID,Is Converted,Channel Grouping,IP Address,City,Country,Location Type,First Touch Source,First Touch Campaign,Page URL\n';
+            if (!filteredLogs.length) return alert('No logs on screen to export.');
+            let csv = 'Timestamp,Handle,User ID,Session ID,Converted,Channel,IP,City,Country,Location Type,Page URL\n';
             filteredLogs.forEach(l => {
                 const t = l.telemetry || {};
                 const loc = t.location || {};
                 const city = loc.provided?.latitude ? 'GPS Pin' : (loc.detected?.city || 'Unknown');
-                const country = loc.detected?.country || 'Unknown';
-                const type = loc.provided?.latitude ? 'User Provided GPS' : 'Server Detected IP';
-                const first = t.first_touch || {};
-                const utms = first.utms || {};
                 const isConv = (t.is_conversion || t.conversion) ? 'TRUE' : 'FALSE';
-                csv += `"${l.received_at}","${t.friendly_username}","${t.user_id}","${t.session_id || ''}","${isConv}","${t.current_visit?.channel_group || 'Direct'}","${l.ip_address}","${city}","${country}","${type}","${utms.utm_source || 'direct'}","${utms.utm_campaign || 'direct'}","${t.current_visit?.page || ''}"\n`;
+                csv += `"${l.received_at}","${t.friendly_username}","${t.user_id}","${t.session_id || ''}","${isConv}","${t.current_visit?.channel_group || 'Direct'}","${l.ip_address}","${city}","${loc.detected?.country || 'Unknown'}","${loc.provided?.latitude ? 'GPS' : 'IP'}","${t.current_visit?.page || ''}"\n`;
             });
-            downloadCSVBlob(csv, 'poboy_filtered_screen_report.csv');
+            downloadCSV(csv, 'poboy_screen_dataset.csv');
         }
 
         function exportFullRawCSV() {
-            if (!rawLogs.length) return alert('No raw logs available for export.');
-            let csv = 'Server Received At,Server Timestamp,User ID,Friendly Handle,Session ID,Session Number,Visit Count,Is Converted,Channel Grouping,IP Address,Detected Country,Detected Region,Detected City,Detected Lat,Detected Lon,GPS Granted,GPS Lat,GPS Lon,First Touch Source,First Touch Medium,First Touch Campaign,gclid,fbclid,msclkid,ttclid,OS Name,Browser Name,Device Category,Screen Resolution,Timezone\n';
-            
+            if (!rawLogs.length) return alert('No raw logs to export.');
+            let csv = 'Timestamp,User ID,Handle,Session ID,Converted,Channel,IP,Country,City,gclid,fbclid,OS,Browser,Device,Resolution,Timezone,Page Title,Page Path\n';
             rawLogs.forEach(l => {
                 const t = l.telemetry || {};
                 const loc = t.location || {};
                 const det = loc.detected || {};
-                const prov = loc.provided || {};
-                const first = t.first_touch || {};
-                const firstUtm = first.utms || {};
                 const cids = t.current_visit?.click_ids || {};
                 const meta = t.telemetry || {};
-
-                csv += `"${l.received_at}",` +
-                       `"${l.server_timestamp}",` +
-                       `"${t.user_id}",` +
-                       `"${t.friendly_username}",` +
-                       `"${t.session_id || ''}",` +
-                       `"${t.session_number || 1}",` +
-                       `"${t.visit_count || 1}",` +
-                       `"${(t.is_conversion || t.conversion) ? 'TRUE' : 'FALSE'}",` +
-                       `"${t.current_visit?.channel_group || 'Direct'}",` +
-                       `"${l.ip_address}",` +
-                       `"${det.country || ''}",` +
-                       `"${det.region || ''}",` +
-                       `"${det.city || ''}",` +
-                       `"${det.lat || 0}",` +
-                       `"${det.lon || 0}",` +
-                       `"${prov.latitude ? 'TRUE' : 'FALSE'}",` +
-                       `"${prov.latitude || ''}",` +
-                       `"${prov.longitude || ''}",` +
-                       `"${firstUtm.utm_source || 'direct'}",` +
-                       `"${firstUtm.utm_medium || 'none'}",` +
-                       `"${firstUtm.utm_campaign || 'direct'}",` +
-                       `"${cids.gclid || ''}",` +
-                       `"${cids.fbclid || ''}",` +
-                       `"${cids.msclkid || ''}",` +
-                       `"${cids.ttclid || ''}",` +
-                       `"${meta.os_name || ''}",` +
-                       `"${meta.browser_name || ''}",` +
-                       `"${meta.device_category || ''}",` +
-                       `"${meta.screen_resolution || ''}",` +
-                       `"${meta.timezone || ''}"\n`;
+                csv += `"${l.received_at}","${t.user_id}","${t.friendly_username}","${t.session_id || ''}","${(t.is_conversion || t.conversion) ? 'TRUE' : 'FALSE'}","${t.current_visit?.channel_group || 'Direct'}","${l.ip_address}","${det.country || ''}","${det.city || ''}","${cids.gclid || ''}","${cids.fbclid || ''}","${meta.os_name || ''}","${meta.browser_name || ''}","${meta.device_category || ''}","${meta.screen_resolution || ''}","${meta.timezone || ''}","${(meta.page_title || '').replace(/"/g, '""')}","${meta.page_path || ''}"\n`;
             });
-
-            downloadCSVBlob(csv, 'poboy_full_enterprise_dataset.csv');
+            downloadCSV(csv, 'poboy_full_enterprise_dataset.csv');
         }
 
-        function downloadCSVBlob(csvContent, filename) {
-            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        function downloadCSV(content, filename) {
+            const blob = new Blob([content], { type: 'text/csv;charset=utf-8;' });
             const a = document.createElement('a');
             a.href = URL.createObjectURL(blob);
             a.download = filename;
             a.click();
         }
 
-        async function runSimulation(type) {
-            let lat = 40.7128; let lon = -74.0060; let city = 'New York'; let country = 'United States'; let isProvided = false;
-            let channelGroup = 'Paid Search (Google)';
-            let clickIds = { gclid: 'g_sim_9988' };
-            let isConv = false;
-            let convObj = null;
-
-            if (type === 'conversion') {
-                isConv = true;
-                convObj = { name: 'Quote Form Submitted', value: 250, timestamp: new Date().toISOString() };
-            } else if (type === 'gps') {
-                lat = 34.0522; lon = -118.2437; city = 'Los Angeles'; country = 'United States'; isProvided = true; channelGroup = 'Direct'; clickIds = {};
-            }
-
-            const testPayload = {
-                user_id: 'pb_sim_' + Math.random().toString(36).substring(7),
-                friendly_username: 'PoBoyTester-' + Math.floor(1000 + Math.random() * 9000),
-                session_id: 'sess_' + Math.random().toString(36).substring(7),
-                session_number: 1,
-                visit_count: 1,
-                is_conversion: isConv,
-                conversion: convObj,
-                first_touch: { timestamp: new Date().toISOString(), page: window.location.href, channel_group: channelGroup, click_ids: clickIds },
-                last_touch: { timestamp: new Date().toISOString(), page: window.location.href, channel_group: channelGroup, click_ids: clickIds },
-                location: {
-                    detected: { country, country_code: 'US', city, lat, lon, source: 'Simulated IP' },
-                    provided: isProvided ? { latitude: lat, longitude: lon, accuracy_meters: 15, granted: true } : null
-                },
-                telemetry: {
-                    os_name: 'Windows', os_version: '11', browser_name: 'Google Chrome', browser_version: '127.0', device_category: 'Desktop',
-                    screen_resolution: '2560x1440', viewport_size: '1920x1080', device_pixel_ratio: 2,
-                    hardware_concurrency: 8, device_memory_gb: 16, connection_type: '4g', timezone: 'America/New_York'
-                }
-            };
-
-            const res = await fetch('log.php', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(testPayload)
-            });
-
-            if (res.ok) {
-                document.getElementById('simResult').textContent = `✅ Simulated visit for ${testPayload.friendly_username}! Reloading logs...`;
-                setTimeout(loadLogs, 800);
-            }
-        }
-
-        renderRulesUI();
-        setDateRange('all');
+        setDateFilter('all');
     </script>
 <?php endif; ?>
 </body>
