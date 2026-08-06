@@ -1,7 +1,7 @@
 <?php
 /**
- * Po'Boy's Data Layer - Ingestion & Database Query Endpoint v5.0.0
- * GitHub: github.com/poboy/poboy-data-layer
+ * Po'Boy Server Side Analytics - Ingestion & Database Query Endpoint v0.9.0-beta
+ * GitHub: github.com/dadelonglegs/poboy
  */
 
 $serverStartTime = microtime(true);

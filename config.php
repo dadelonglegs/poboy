@@ -1,7 +1,7 @@
 <?php
 /**
- * Po'Boy's Data Layer - Universal Configuration File
- * GitHub: github.com/poboy/poboy-data-layer
+ * Po'Boy Server Side Analytics Configuration File
+ * GitHub: github.com/dadelonglegs/poboy
  */
 
 // Dashboard Password Authentication

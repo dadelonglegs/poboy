@@ -1,8 +1,8 @@
 <?php
 /**
- * Po'Boy's Data Layer - Universal Attribution Dashboard v13.0.0
+ * Po'Boy Server Side Analytics - Universal Attribution Dashboard v0.9.0-beta
  * New Orleans French Quarter Warm Amber & Cajun Crimson Theme
- * GitHub: github.com/poboy/poboy-data-layer
+ * GitHub: github.com/dadelonglegs/poboy
  */
 
 require_once __DIR__ . '/config.php';
