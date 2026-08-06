@@ -1,6 +1,5 @@
 /**
- * Po'Boy's Data Layer Automated cPanel Packager Script v6.0.0
- * Builds both Full Dashboard Package & Standalone GTM Package (Zero Backend)
+ * Po'Boy Server Side Analytics Automated cPanel Packager Script
  */
 const fs = require('fs');
 const path = require('path');
@@ -46,12 +45,10 @@ fs.writeFileSync(path.join(targetSubfolder, '.htaccess'), rootHtaccess);
 
 const filesToInclude = [
     'poboy.js',
-    'poboy-standalone.js',
     'log.php',
     'config.php',
     'dashboard.php',
-    'GTM_POBOY_CONTAINER.json',
-    'GTM_POBOY_STANDALONE.json'
+    'GTM_POBOY_CONTAINER.json'
 ];
 
 filesToInclude.forEach(file => {
@@ -59,8 +56,6 @@ filesToInclude.forEach(file => {
     const destPath = path.join(targetSubfolder, file);
     if (fs.existsSync(srcPath)) {
         let content = fs.readFileSync(srcPath, 'utf8');
-        content = content.replace(/\/supercookie\/log\.php/g, '/poboy/log.php');
-        content = content.replace(/\/supercookie\/poboy\.js/g, '/poboy/poboy.js');
         fs.writeFileSync(destPath, content);
         console.log(`  ✓ Added ${file}`);
     }
