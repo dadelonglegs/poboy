@@ -416,11 +416,11 @@ $isAuthenticated = $_SESSION['sc_authenticated'] ?? false;
     <!-- NAVIGATION TABS -->
     <nav class="ga4-nav-tabs">
         <button class="nav-tab active" onclick="showSection('overview')">🏠 Realtime Overview</button>
-        <button class="nav-tab" onclick="showSection('acquisition')">🎯 Acquisition & Attribution</button>
-        <button class="nav-tab" onclick="showSection('tech')">🖥️ Tech & Hardware Dimensions</button>
-        <button class="nav-tab" onclick="showSection('content')">📄 Pages & Content Telemetry</button>
+        <button class="nav-tab" onclick="showSection('userscope')">👤 User Scope (Visitor Lifetime)</button>
+        <button class="nav-tab" onclick="showSection('sessionscope')">⏱️ Session Scope (30-Min Window)</button>
+        <button class="nav-tab" onclick="showSection('eventscope')">⚡ Event Scope (Hits & Content)</button>
         <button class="nav-tab" onclick="showSection('location')">🗺️ Geographic Intelligence</button>
-        <button class="nav-tab" onclick="showSection('query')">🎛️ Custom Dimension Explorer & Export</button>
+        <button class="nav-tab" onclick="showSection('query')">🎛️ Scoped Query Builder & Export</button>
     </nav>
 
     <main class="ga4-body">
@@ -497,12 +497,13 @@ $isAuthenticated = $_SESSION['sc_authenticated'] ?? false;
         </section>
 
         <!-- SECTION 2: ACQUISITION & ATTRIBUTION -->
-        <section id="sec-acquisition" class="section-block" style="display: none;">
+        <!-- SECTION 2: USER SCOPE (VISITOR LIFETIME) -->
+        <section id="sec-userscope" class="section-block" style="display: none;">
             <div class="card-panel" style="margin-bottom: 24px;">
                 <div class="card-header">
                     <div>
-                        <div class="card-title">First Touch vs Last Touch Campaign Matrix</div>
-                        <div class="card-sub">Multi-touch attribution dimensions and URL parameters</div>
+                        <div class="card-title">👤 User Scope: Visitor Lifetime & First-Touch Attribution Matrix</div>
+                        <div class="card-sub">730-day persistent visitor identity, cumulative touch counts, and retained parameter vaults</div>
                     </div>
                 </div>
                 <table class="ga4-table">
@@ -516,33 +517,35 @@ $isAuthenticated = $_SESSION['sc_authenticated'] ?? false;
                         </tr>
                     </thead>
                     <tbody id="table-acquisition">
-                        <tr><td colspan="5" style="text-align: center; color: var(--text-secondary);">Loading acquisition dimensions...</td></tr>
+                        <tr><td colspan="5" style="text-align: center; color: var(--text-secondary);">Loading user scope dimensions...</td></tr>
                     </tbody>
                 </table>
             </div>
         </section>
 
-        <!-- SECTION 3: TECH & HARDWARE DIMENSIONS -->
-        <section id="sec-tech" class="section-block" style="display: none;">
+        <!-- SECTION 3: SESSION SCOPE (30-MIN INACTIVITY WINDOW) -->
+        <section id="sec-sessionscope" class="section-block" style="display: none;">
             <div class="reports-grid">
                 <div class="card-panel">
                     <div class="card-header">
-                        <div class="card-title">Operating Systems & Browsers</div>
+                        <div class="card-title">⏱️ Session Scope: Operating Systems & Browsers</div>
+                        <div class="card-sub">Session hardware & browser dimensions across active 30-min windows</div>
                     </div>
-                    <div id="chart-os-browser">Loading OS & Browser dimensions...</div>
+                    <div id="chart-os-browser">Loading session OS & Browser dimensions...</div>
                 </div>
 
                 <div class="card-panel">
                     <div class="card-header">
-                        <div class="card-title">Screen Resolutions & Hardware Specs</div>
+                        <div class="card-title">🖥️ Session Scope: Screen Resolutions & Hardware Specs</div>
+                        <div class="card-sub">Device memory (RAM), CPU cores, and connection types</div>
                     </div>
-                    <div id="chart-hardware">Loading hardware dimensions...</div>
+                    <div id="chart-hardware">Loading session hardware dimensions...</div>
                 </div>
             </div>
         </section>
 
-        <!-- SECTION 4: PAGES & CONTENT TELEMETRY -->
-        <section id="sec-content" class="section-block" style="display: none;">
+        <!-- SECTION 4: EVENT SCOPE (HITS & CONTENT) -->
+        <section id="sec-eventscope" class="section-block" style="display: none;">
             <div class="card-panel">
                 <div class="card-header">
                     <div>
@@ -1097,16 +1100,20 @@ $isAuthenticated = $_SESSION['sc_authenticated'] ?? false;
             const rawPayload = log.telemetry || {};
             const t = rawPayload.telemetry || rawPayload;
             
-            const ident = t.identity || {};
-            const sess = t.session || {};
+            const uScope = t.user_scope || {};
+            const sScope = t.session_scope || {};
+            const eScope = t.event_scope || {};
+
+            const ident = t.identity || uScope;
+            const sess = t.session || sScope;
             const attr = t.attribution || {};
-            const loc = t.location || {};
-            const meta = t.meta || {};
-            const social = t.social || {};
-            const schema = t.schema || {};
-            const dom = t.dom_metrics || {};
-            const dev = t.device || {};
-            const perf = t.performance || {};
+            const loc = t.location || sScope.location || {};
+            const meta = t.meta || eScope.meta || {};
+            const social = t.social || eScope.social || {};
+            const schema = t.schema || eScope.schema || {};
+            const dom = t.dom_metrics || eScope.dom_metrics || {};
+            const dev = t.device || sScope.device || {};
+            const perf = t.performance || eScope.performance || {};
             const params = t.parameters || {};
             const conv = t.conversion || rawPayload.conversion;
             const serv = log.server_telemetry || {};
@@ -1148,97 +1155,53 @@ $isAuthenticated = $_SESSION['sc_authenticated'] ?? false;
                     </div>
                 </div>` : ''}
 
+                <!-- 1. USER SCOPE -->
                 <div class="tree-node">
-                    <div style="font-weight:700; color:var(--primary); margin-bottom:4px;">🥪 Identity & Session Dimensions</div>
-                    <div class="tree-box">
+                    <div style="font-weight:800; color:var(--primary); font-size:14px; margin-bottom:4px;">👤 1. USER SCOPE (730-Day Long-Lived Visitor Identity)</div>
+                    <div class="tree-box" style="border-color:rgba(56, 189, 248, 0.3); background:rgba(56, 189, 248, 0.05);">
                         <strong>Friendly Handle:</strong> ${friendlyHandle}<br>
                         <strong>User ID (UUID):</strong> ${userId}<br>
+                        <strong>Total Touch / Visit Count:</strong> ${uScope.visit_count || sess.visit_count || rawPayload.visit_count || t.visit_count || 1}<br>
+                        <strong>First Visit:</strong> ${uScope.is_first_visit ? 'Yes (New Visitor)' : 'No'} | <strong>Returning User:</strong> ${uScope.is_returning_user ? 'Yes' : 'No'}<br>
+                        <strong>First Touch Source:</strong> ${uScope.first_touch?.utms?.utm_source || attr.first_touch_source || 'direct'} | <strong>First Touch Campaign:</strong> ${uScope.first_touch?.utms?.utm_campaign || attr.first_touch_campaign || 'direct'}<br>
+                        <strong>Retained Parameter Vault:</strong> ${JSON.stringify(uScope.param_vault || params.vault || rawPayload.vault_params || {})}
+                    </div>
+                </div>
+
+                <!-- 2. SESSION SCOPE -->
+                <div class="tree-node">
+                    <div style="font-weight:800; color:var(--accent-amber); font-size:14px; margin-bottom:4px;">⏱️ 2. SESSION SCOPE (30-Minute Active Window)</div>
+                    <div class="tree-box" style="border-color:rgba(245, 158, 11, 0.3); background:rgba(245, 158, 11, 0.05);">
                         <strong>Session ID:</strong> ${sessionId}<br>
-                        <strong>Session Number:</strong> ${sess.session_number || 1} | <strong>Session Page Views:</strong> ${sess.session_page_views || 1}<br>
-                        <strong>Total Visit / Touch Count:</strong> ${sess.visit_count || rawPayload.visit_count || t.visit_count || 1}<br>
-                        <strong>First Visit:</strong> ${sess.is_first_visit ? 'Yes (New Visitor)' : 'No'} | <strong>Returning User:</strong> ${sess.is_returning_user ? 'Yes' : 'No'}
+                        <strong>Session Number:</strong> ${sScope.session_number || sess.session_number || 1} | <strong>Session Page Views:</strong> ${sScope.session_page_views || sess.session_page_views || 1}<br>
+                        <strong>Session Start Time:</strong> ${sScope.session_start_time || sess.start_time || 'N/A'}<br>
+                        <strong>Channel Grouping:</strong> ${sScope.channel_group || attr.channel_group || rawPayload.channel_group || 'Direct'}<br>
+                        <strong>Hardware Diagnostics:</strong> ${dev.category || 'Desktop'} • OS: ${osName} • Browser: ${browserName} • Screen: ${screenRes} (${viewportSize}) • RAM: ${ramGb} GB • CPU: ${cpuCores} Cores • Connection: ${dev.connection_type || 'unknown'}<br>
+                        <strong>Location Intelligence:</strong> IP: ${log.ip_address || '127.0.0.1'} • City: ${detectedCity} • Region: ${detectedRegion} • Country: ${detectedCountry} • Lat/Lon: (${latVal}, ${lonVal}) • Timezone: ${loc.timezone || 'America/Toronto'} (Offset: ${loc.timezone_offset_hours ?? -4} hrs) • Source: ${locSource}
                     </div>
                 </div>
 
+                <!-- 3. EVENT SCOPE -->
                 <div class="tree-node">
-                    <div style="font-weight:700; color:var(--accent-orange); margin-bottom:4px;">🎯 Attribution & Click ID Vault</div>
-                    <div class="tree-box">
-                        <strong>Channel Grouping:</strong> ${attr.channel_group || rawPayload.channel_group || t.channel_group || 'Direct'}<br>
-                        <strong>First Touch Source:</strong> ${attr.first_touch_source || 'direct'} | <strong>First Touch Campaign:</strong> ${attr.first_touch_campaign || 'direct'}<br>
-                        <strong>UTM Parameters:</strong> ${JSON.stringify(attr.utms || t.current_visit?.utms || {})}<br>
-                        <strong>Click IDs (gclid/fbclid/etc.):</strong> ${JSON.stringify(attr.click_ids || t.current_visit?.click_ids || {})}<br>
-                        <strong>Parameter Vault (Retained Parameters):</strong> ${JSON.stringify(params.vault || rawPayload.vault_params || {})}
-                    </div>
-                </div>
-
-                <div class="tree-node">
-                    <div style="font-weight:700; color:#ffffff; margin-bottom:4px;">📄 Page & Content Telemetry</div>
-                    <div class="tree-box">
+                    <div style="font-weight:800; color:#ffffff; font-size:14px; margin-bottom:4px;">⚡ 3. EVENT SCOPE (Per-Hit / Pageview Level)</div>
+                    <div class="tree-box" style="border-color:rgba(255, 255, 255, 0.2);">
+                        <strong>Event Name:</strong> ${eScope.event_name || 'page_view'} | <strong>Timestamp:</strong> ${eScope.event_timestamp || log.received_at}<br>
                         <strong>Page Title:</strong> ${pageTitle}<br>
                         <strong>Page Location (URL):</strong> ${pageLocation}<br>
-                        <strong>Page Path:</strong> ${pagePath}<br>
-                        <strong>Main H1 Heading:</strong> ${meta.heading_h1 || 'N/A'}<br>
-                        <strong>All H1 Texts:</strong> ${JSON.stringify(meta.all_h1_texts || [])}<br>
-                        <strong>Meta Description:</strong> ${meta.description || 'N/A'}<br>
-                        <strong>Meta Keywords:</strong> ${meta.keywords || 'N/A'} | <strong>Author:</strong> ${meta.author || 'N/A'}<br>
-                        <strong>Canonical URL:</strong> ${meta.canonical_url || 'N/A'} | <strong>Favicon URL:</strong> ${meta.favicon_url || 'N/A'}
+                        <strong>Page Path:</strong> ${pagePath} | <strong>Referrer:</strong> ${eScope.referrer || 'direct'}<br>
+                        <strong>UTM Parameters:</strong> ${JSON.stringify(eScope.utms || attr.utms || {})}<br>
+                        <strong>Click IDs:</strong> ${JSON.stringify(eScope.click_ids || attr.click_ids || {})}<br>
+                        <strong>Meta Description:</strong> ${meta.description || 'N/A'} | <strong>Heading H1:</strong> ${meta.heading_h1 || 'N/A'}<br>
+                        <strong>Social OpenGraph:</strong> og:title: "${social.og_title || 'N/A'}" | og:image: "${social.og_image || 'N/A'}"<br>
+                        <strong>Schema.org JSON-LD Types:</strong> ${schema.types_list || 'None detected'}<br>
+                        <strong>DOM Node Metrics:</strong> H1: ${dom.total_h1_count ?? 0} | H2: ${dom.total_h2_count ?? 0} | Links: ${dom.total_links_count ?? 0} | Images: ${dom.total_images_count ?? 0} | Forms: ${dom.total_forms_count ?? 0} | Nodes: ${dom.dom_nodes_count ?? 0}<br>
+                        <strong>Performance Diagnostics:</strong> Client Script: ${perf.execution_time_ms || 0.4} ms | Server Exec: ${serv.execution_time_ms || 0} ms | Host: ${serv.server_hostname || 'N/A'} (PHP ${serv.php_version || '8.x'})
                     </div>
                 </div>
 
+                <!-- 4. RAW DATA LAYER JSON -->
                 <div class="tree-node">
-                    <div style="font-weight:700; color:var(--accent-cyan); margin-bottom:4px;">💬 Social OpenGraph & Meta Tags</div>
-                    <div class="tree-box">
-                        <strong>og:title:</strong> ${social.og_title || 'N/A'}<br>
-                        <strong>og:type:</strong> ${social.og_type || 'N/A'} | <strong>og:site_name:</strong> ${social.og_site_name || 'N/A'}<br>
-                        <strong>og:image:</strong> ${social.og_image || 'N/A'}<br>
-                        <strong>og:url:</strong> ${social.og_url || 'N/A'}<br>
-                        <strong>twitter:card:</strong> ${social.twitter_card || 'N/A'} | <strong>twitter:title:</strong> ${social.twitter_title || 'N/A'}
-                    </div>
-                </div>
-
-                <div class="tree-node">
-                    <div style="font-weight:700; color:var(--accent-indigo); margin-bottom:4px;">🧩 Schema.org & DOM Metrics</div>
-                    <div class="tree-box">
-                        <strong>Schema JSON-LD Types:</strong> ${schema.types_list || 'None detected'}<br>
-                        <strong>JSON-LD Schemas Data:</strong> ${JSON.stringify(schema.json_ld || [])}<br>
-                        <strong>DOM Metrics:</strong> H1 Count: ${dom.total_h1_count ?? 0} | H2 Count: ${dom.total_h2_count ?? 0} | Links: ${dom.total_links_count ?? 0} | Images: ${dom.total_images_count ?? 0} | Forms: ${dom.total_forms_count ?? 0} | Total DOM Nodes: ${dom.dom_nodes_count ?? 0}
-                    </div>
-                </div>
-
-                <div class="tree-node">
-                    <div style="font-weight:700; color:var(--accent-amber); margin-bottom:4px;">🖥️ Device & Hardware Diagnostics</div>
-                    <div class="tree-box">
-                        <strong>Device Category:</strong> ${dev.category || 'Desktop'}<br>
-                        <strong>OS Name:</strong> ${osName} | <strong>Browser Name:</strong> ${browserName}<br>
-                        <strong>Screen Resolution:</strong> ${screenRes} | <strong>Viewport Size:</strong> ${viewportSize}<br>
-                        <strong>Device Memory (RAM GB):</strong> ${ramGb} GB | <strong>CPU Cores:</strong> ${cpuCores} Cores<br>
-                        <strong>Connection Type:</strong> ${dev.connection_type || 'unknown'}
-                    </div>
-                </div>
-
-                <div class="tree-node">
-                    <div style="font-weight:700; color:var(--accent-green); margin-bottom:4px;">🌍 Location Intelligence</div>
-                    <div class="tree-box">
-                        <strong>Detected IP Address:</strong> ${log.ip_address || '127.0.0.1'}<br>
-                        <strong>City:</strong> ${detectedCity} | <strong>Region:</strong> ${detectedRegion} | <strong>Country:</strong> ${detectedCountry}<br>
-                        <strong>Latitude:</strong> ${latVal} | <strong>Longitude:</strong> ${lonVal}<br>
-                        <strong>Timezone:</strong> ${loc.timezone || 'America/Toronto'} (Offset: ${loc.timezone_offset_hours ?? -4} hrs)<br>
-                        <strong>Location Source:</strong> ${locSource} | <strong>Permission Status:</strong> ${permStatus}
-                    </div>
-                </div>
-
-                <div class="tree-node">
-                    <div style="font-weight:700; color:var(--text-secondary); margin-bottom:4px;">⚡ Performance & Server Diagnostics</div>
-                    <div class="tree-box">
-                        <strong>Client Script Execution Time:</strong> ${perf.execution_time_ms || 0.4} ms<br>
-                        <strong>Server Response Time:</strong> ${serv.execution_time_ms || 0} ms<br>
-                        <strong>Server Hostname:</strong> ${serv.server_hostname || 'N/A'} | <strong>Server Software:</strong> ${serv.server_software || 'Apache'}<br>
-                        <strong>PHP Version:</strong> ${serv.php_version || '8.x'} | <strong>Memory Usage:</strong> ${serv.memory_usage_mb || 0} MB
-                    </div>
-                </div>
-
-                <div class="tree-node">
-                    <div style="font-weight:700; color:var(--primary); margin-bottom:4px;">🔍 Raw JSON Data Layer Push Payload</div>
+                    <div style="font-weight:700; color:var(--primary); margin-bottom:4px;">🔍 4. Raw JSON Data Layer Push Payload</div>
                     <div class="tree-box" style="overflow-x:auto;">
                         <pre style="margin:0; font-family:var(--font-mono); font-size:11px; color:var(--primary);">${JSON.stringify(rawPayload, null, 2)}</pre>
                     </div>
