@@ -1094,7 +1094,9 @@ $isAuthenticated = $_SESSION['sc_authenticated'] ?? false;
 
         function inspectRow(index) {
             const log = filteredLogs[index];
-            const t = log.telemetry || {};
+            const rawPayload = log.telemetry || {};
+            const t = rawPayload.telemetry || rawPayload;
+            
             const ident = t.identity || {};
             const sess = t.session || {};
             const attr = t.attribution || {};
@@ -1106,11 +1108,34 @@ $isAuthenticated = $_SESSION['sc_authenticated'] ?? false;
             const dev = t.device || {};
             const perf = t.performance || {};
             const params = t.parameters || {};
-            const conv = t.conversion;
+            const conv = t.conversion || rawPayload.conversion;
             const serv = log.server_telemetry || {};
+            const geoDet = log.location?.detected || {};
 
-            document.getElementById('mHandle').textContent = ident.friendly_handle || t.friendly_username || 'User Telemetry Inspector';
-            document.getElementById('mUserId').textContent = `User ID: ${ident.user_id || t.user_id || 'N/A'} | Session ID: ${sess.session_id || t.session_id || 'N/A'}`;
+            const friendlyHandle = ident.friendly_handle || rawPayload.friendly_username || t.friendly_username || 'User Telemetry Inspector';
+            const userId = ident.user_id || rawPayload.user_id || t.user_id || 'N/A';
+            const sessionId = sess.session_id || rawPayload.session_id || t.session_id || 'N/A';
+
+            document.getElementById('mHandle').textContent = friendlyHandle;
+            document.getElementById('mUserId').textContent = `User ID: ${userId} | Session ID: ${sessionId}`;
+
+            const pageTitle = meta.page_title || rawPayload.page_title || t.page_title || 'N/A';
+            const pageLocation = meta.page_location || rawPayload.page_location || t.page_location || 'N/A';
+            const pagePath = meta.page_path || rawPayload.page_path || 'N/A';
+            const osName = dev.os_name || rawPayload.os_name || 'N/A';
+            const browserName = dev.browser_name || rawPayload.browser_name || 'N/A';
+            const screenRes = dev.screen_resolution || rawPayload.screen_resolution || 'N/A';
+            const viewportSize = dev.viewport_size || rawPayload.viewport_size || 'N/A';
+            const ramGb = dev.device_memory_gb || rawPayload.device_memory_gb || 'N/A';
+            const cpuCores = dev.hardware_concurrency || rawPayload.hardware_concurrency || 'N/A';
+
+            const detectedCity = loc.city || geoDet.city || 'Unknown';
+            const detectedCountry = loc.country || geoDet.country || 'Unknown';
+            const detectedRegion = loc.region || geoDet.region || '';
+            const latVal = loc.latitude || geoDet.lat || 'N/A';
+            const lonVal = loc.longitude || geoDet.lon || 'N/A';
+            const locSource = loc.location_source || (loc.latitude ? 'gps_permission_granted' : 'GeoIP Service');
+            const permStatus = loc.permission_status || (loc.latitude ? 'granted' : 'prompt');
 
             let html = `
                 ${conv ? `
@@ -1126,11 +1151,11 @@ $isAuthenticated = $_SESSION['sc_authenticated'] ?? false;
                 <div class="tree-node">
                     <div style="font-weight:700; color:var(--primary); margin-bottom:4px;">🥪 Identity & Session Dimensions</div>
                     <div class="tree-box">
-                        <strong>Friendly Handle:</strong> ${ident.friendly_handle || t.friendly_username || 'N/A'}<br>
-                        <strong>User ID (UUID):</strong> ${ident.user_id || t.user_id || 'N/A'}<br>
-                        <strong>Session ID:</strong> ${sess.session_id || t.session_id || 'N/A'}<br>
+                        <strong>Friendly Handle:</strong> ${friendlyHandle}<br>
+                        <strong>User ID (UUID):</strong> ${userId}<br>
+                        <strong>Session ID:</strong> ${sessionId}<br>
                         <strong>Session Number:</strong> ${sess.session_number || 1} | <strong>Session Page Views:</strong> ${sess.session_page_views || 1}<br>
-                        <strong>Total Visit / Touch Count:</strong> ${sess.visit_count || t.visit_count || 1}<br>
+                        <strong>Total Visit / Touch Count:</strong> ${sess.visit_count || rawPayload.visit_count || t.visit_count || 1}<br>
                         <strong>First Visit:</strong> ${sess.is_first_visit ? 'Yes (New Visitor)' : 'No'} | <strong>Returning User:</strong> ${sess.is_returning_user ? 'Yes' : 'No'}
                     </div>
                 </div>
@@ -1138,20 +1163,20 @@ $isAuthenticated = $_SESSION['sc_authenticated'] ?? false;
                 <div class="tree-node">
                     <div style="font-weight:700; color:var(--accent-orange); margin-bottom:4px;">🎯 Attribution & Click ID Vault</div>
                     <div class="tree-box">
-                        <strong>Channel Grouping:</strong> ${attr.channel_group || t.current_visit?.channel_group || 'Direct'}<br>
+                        <strong>Channel Grouping:</strong> ${attr.channel_group || rawPayload.channel_group || t.channel_group || 'Direct'}<br>
                         <strong>First Touch Source:</strong> ${attr.first_touch_source || 'direct'} | <strong>First Touch Campaign:</strong> ${attr.first_touch_campaign || 'direct'}<br>
                         <strong>UTM Parameters:</strong> ${JSON.stringify(attr.utms || t.current_visit?.utms || {})}<br>
                         <strong>Click IDs (gclid/fbclid/etc.):</strong> ${JSON.stringify(attr.click_ids || t.current_visit?.click_ids || {})}<br>
-                        <strong>Parameter Vault (Retained Parameters):</strong> ${JSON.stringify(params.vault || {})}
+                        <strong>Parameter Vault (Retained Parameters):</strong> ${JSON.stringify(params.vault || rawPayload.vault_params || {})}
                     </div>
                 </div>
 
                 <div class="tree-node">
                     <div style="font-weight:700; color:#ffffff; margin-bottom:4px;">📄 Page & Content Telemetry</div>
                     <div class="tree-box">
-                        <strong>Page Title:</strong> ${meta.page_title || 'N/A'}<br>
-                        <strong>Page Location (URL):</strong> ${meta.page_location || 'N/A'}<br>
-                        <strong>Page Path:</strong> ${meta.page_path || '/'}<br>
+                        <strong>Page Title:</strong> ${pageTitle}<br>
+                        <strong>Page Location (URL):</strong> ${pageLocation}<br>
+                        <strong>Page Path:</strong> ${pagePath}<br>
                         <strong>Main H1 Heading:</strong> ${meta.heading_h1 || 'N/A'}<br>
                         <strong>All H1 Texts:</strong> ${JSON.stringify(meta.all_h1_texts || [])}<br>
                         <strong>Meta Description:</strong> ${meta.description || 'N/A'}<br>
@@ -1176,7 +1201,7 @@ $isAuthenticated = $_SESSION['sc_authenticated'] ?? false;
                     <div class="tree-box">
                         <strong>Schema JSON-LD Types:</strong> ${schema.types_list || 'None detected'}<br>
                         <strong>JSON-LD Schemas Data:</strong> ${JSON.stringify(schema.json_ld || [])}<br>
-                        <strong>DOM Metrics:</strong> H1 Count: ${dom.total_h1_count || 0} | H2 Count: ${dom.total_h2_count || 0} | Links: ${dom.total_links_count || 0} | Images: ${dom.total_images_count || 0} | Forms: ${dom.total_forms_count || 0} | Total DOM Nodes: ${dom.dom_nodes_count || 0}
+                        <strong>DOM Metrics:</strong> H1 Count: ${dom.total_h1_count ?? 0} | H2 Count: ${dom.total_h2_count ?? 0} | Links: ${dom.total_links_count ?? 0} | Images: ${dom.total_images_count ?? 0} | Forms: ${dom.total_forms_count ?? 0} | Total DOM Nodes: ${dom.dom_nodes_count ?? 0}
                     </div>
                 </div>
 
@@ -1184,9 +1209,9 @@ $isAuthenticated = $_SESSION['sc_authenticated'] ?? false;
                     <div style="font-weight:700; color:var(--accent-amber); margin-bottom:4px;">🖥️ Device & Hardware Diagnostics</div>
                     <div class="tree-box">
                         <strong>Device Category:</strong> ${dev.category || 'Desktop'}<br>
-                        <strong>OS Name:</strong> ${dev.os_name || 'N/A'} | <strong>Browser Name:</strong> ${dev.browser_name || 'N/A'}<br>
-                        <strong>Screen Resolution:</strong> ${dev.screen_resolution || 'N/A'} | <strong>Viewport Size:</strong> ${dev.viewport_size || 'N/A'}<br>
-                        <strong>Device Memory (RAM GB):</strong> ${dev.device_memory_gb || 'N/A'} GB | <strong>CPU Cores:</strong> ${dev.hardware_concurrency || 'N/A'} Cores<br>
+                        <strong>OS Name:</strong> ${osName} | <strong>Browser Name:</strong> ${browserName}<br>
+                        <strong>Screen Resolution:</strong> ${screenRes} | <strong>Viewport Size:</strong> ${viewportSize}<br>
+                        <strong>Device Memory (RAM GB):</strong> ${ramGb} GB | <strong>CPU Cores:</strong> ${cpuCores} Cores<br>
                         <strong>Connection Type:</strong> ${dev.connection_type || 'unknown'}
                     </div>
                 </div>
@@ -1195,10 +1220,10 @@ $isAuthenticated = $_SESSION['sc_authenticated'] ?? false;
                     <div style="font-weight:700; color:var(--accent-green); margin-bottom:4px;">🌍 Location Intelligence</div>
                     <div class="tree-box">
                         <strong>Detected IP Address:</strong> ${log.ip_address || '127.0.0.1'}<br>
-                        <strong>Server Detected Location:</strong> ${JSON.stringify(loc.detected || {})}<br>
-                        <strong>GPS Permission Location:</strong> ${JSON.stringify(loc.provided || 'None Provided')}<br>
-                        <strong>Timezone:</strong> ${loc.timezone || 'N/A'} (Offset: ${loc.timezone_offset_hours || 0} hrs)<br>
-                        <strong>Location Source:</strong> ${loc.location_source || 'N/A'} | <strong>Permission Status:</strong> ${loc.permission_status || 'prompt'}
+                        <strong>City:</strong> ${detectedCity} | <strong>Region:</strong> ${detectedRegion} | <strong>Country:</strong> ${detectedCountry}<br>
+                        <strong>Latitude:</strong> ${latVal} | <strong>Longitude:</strong> ${lonVal}<br>
+                        <strong>Timezone:</strong> ${loc.timezone || 'America/Toronto'} (Offset: ${loc.timezone_offset_hours ?? -4} hrs)<br>
+                        <strong>Location Source:</strong> ${locSource} | <strong>Permission Status:</strong> ${permStatus}
                     </div>
                 </div>
 
@@ -1215,7 +1240,7 @@ $isAuthenticated = $_SESSION['sc_authenticated'] ?? false;
                 <div class="tree-node">
                     <div style="font-weight:700; color:var(--primary); margin-bottom:4px;">🔍 Raw JSON Data Layer Push Payload</div>
                     <div class="tree-box" style="overflow-x:auto;">
-                        <pre style="margin:0; font-family:var(--font-mono); font-size:11px; color:var(--primary);">${JSON.stringify(t, null, 2)}</pre>
+                        <pre style="margin:0; font-family:var(--font-mono); font-size:11px; color:var(--primary);">${JSON.stringify(rawPayload, null, 2)}</pre>
                     </div>
                 </div>
             `;

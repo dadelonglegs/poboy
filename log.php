@@ -278,6 +278,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 
+    if (isset($payload['telemetry']['location']) && is_array($payload['telemetry']['location'])) {
+        if (empty($payload['telemetry']['location']['city'])) {
+            $payload['telemetry']['location']['city'] = $geoDetected['city'] ?? 'Unknown';
+            $payload['telemetry']['location']['region'] = $geoDetected['region'] ?? '';
+            $payload['telemetry']['location']['country'] = $geoDetected['country'] ?? 'Unknown';
+            $payload['telemetry']['location']['country_code'] = $geoDetected['country_code'] ?? 'XX';
+        }
+    }
+
     $payload['location'] = [
         'detected' => $geoDetected,
         'provided' => $payload['location']['provided'] ?? null,
