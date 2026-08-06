@@ -1,6 +1,6 @@
 <?php
 /**
- * Po'Boy Server Side Analytics - Denver Broncos Vibrant Orange & Navy Suite v0.9.0-beta
+ * Po'Boy Server Side Analytics v0.9.0-beta
  * GitHub: github.com/dadelonglegs/poboy
  */
 
@@ -29,7 +29,7 @@ $isAuthenticated = $_SESSION['sc_authenticated'] ?? false;
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Po'Boy Server Side Analytics - Denver Broncos Edition</title>
+    <title>Po'Boy Server Side Analytics</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -46,7 +46,7 @@ $isAuthenticated = $_SESSION['sc_authenticated'] ?? false;
             --navy-brand: #002244;
             --navy-light: #162a4a;
             --primary-gradient: linear-gradient(135deg, #fb4f14 0%, #ff7a00 50%, #002244 100%);
-            --broncos-gradient: linear-gradient(135deg, #002244 0%, #0e1e38 60%, #fb4f14 100%);
+            --accent-gradient: linear-gradient(135deg, #002244 0%, #0e1e38 60%, #fb4f14 100%);
             --accent-orange: #fb4f14;
             --accent-gold: #ffb703;
             --accent-green: #10b981;
@@ -493,7 +493,7 @@ $isAuthenticated = $_SESSION['sc_authenticated'] ?? false;
 <?php else: ?>
     <header class="header-bar">
         <div class="brand">
-            🥪 Po'Boy Server Side Analytics <span class="brand-badge">v0.9.0 Denver Broncos</span>
+            🥪 Po'Boy Server Side Analytics <span class="brand-badge">v0.9.0-beta</span>
         </div>
         <div class="user-nav">
             <span style="font-size: 13px; color: var(--text-secondary);">GitHub: <a href="https://github.com/dadelonglegs/poboy" target="_blank" style="color: var(--accent-orange); text-decoration: none;">dadelonglegs/poboy</a></span>
