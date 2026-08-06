@@ -1095,41 +1095,127 @@ $isAuthenticated = $_SESSION['sc_authenticated'] ?? false;
         function inspectRow(index) {
             const log = filteredLogs[index];
             const t = log.telemetry || {};
-            const meta = t.telemetry || t.browser || {};
+            const ident = t.identity || {};
+            const sess = t.session || {};
+            const attr = t.attribution || {};
             const loc = t.location || {};
+            const meta = t.meta || {};
+            const social = t.social || {};
+            const schema = t.schema || {};
+            const dom = t.dom_metrics || {};
+            const dev = t.device || {};
+            const perf = t.performance || {};
+            const params = t.parameters || {};
             const conv = t.conversion;
+            const serv = log.server_telemetry || {};
 
-            document.getElementById('mHandle').textContent = t.friendly_username || 'User Telemetry Details';
-            document.getElementById('mUserId').textContent = `User ID: ${t.user_id || 'N/A'} | Session ID: ${t.session_id || 'N/A'}`;
+            document.getElementById('mHandle').textContent = ident.friendly_handle || t.friendly_username || 'User Telemetry Inspector';
+            document.getElementById('mUserId').textContent = `User ID: ${ident.user_id || t.user_id || 'N/A'} | Session ID: ${sess.session_id || t.session_id || 'N/A'}`;
 
             let html = `
                 ${conv ? `
                 <div class="tree-node">
-                    <div style="font-weight:700; color:#10b981; margin-bottom:4px;">🎯 Conversion Triggered</div>
-                    <div class="tree-box">Event: ${conv.name || 'Form Lead'}<br>Value: $${conv.value || 0}<br>Time: ${conv.timestamp || log.received_at}</div>
+                    <div style="font-weight:700; color:#10b981; margin-bottom:4px;">🎯 Conversion Event Triggered</div>
+                    <div class="tree-box">
+                        <strong>Event Name:</strong> ${conv.name || 'Lead Submission'}<br>
+                        <strong>Value:</strong> $${conv.value || 0}<br>
+                        <strong>Triggered At:</strong> ${conv.timestamp || log.received_at}
+                    </div>
                 </div>` : ''}
+
                 <div class="tree-node">
-                    <div style="font-weight:700; color:#ffffff; margin-bottom:4px;">🖥️ Hardware & Hardware Telemetry</div>
+                    <div style="font-weight:700; color:var(--primary); margin-bottom:4px;">🥪 Identity & Session Dimensions</div>
                     <div class="tree-box">
-                        OS: ${meta.os_name || 'N/A'} (${meta.os_version || 'N/A'}) | Browser: ${meta.browser_name || 'N/A'}<br>
-                        Resolution: ${meta.screen_resolution} (${meta.viewport_size}) | RAM: ${meta.device_memory_gb || 8} GB | CPU Cores: ${meta.hardware_concurrency || 8}<br>
-                        Network: ${meta.connection_type || '4g'} | Execution Speed: ${meta.execution_time_ms || 0.4} ms
+                        <strong>Friendly Handle:</strong> ${ident.friendly_handle || t.friendly_username || 'N/A'}<br>
+                        <strong>User ID (UUID):</strong> ${ident.user_id || t.user_id || 'N/A'}<br>
+                        <strong>Session ID:</strong> ${sess.session_id || t.session_id || 'N/A'}<br>
+                        <strong>Session Number:</strong> ${sess.session_number || 1} | <strong>Session Page Views:</strong> ${sess.session_page_views || 1}<br>
+                        <strong>Total Visit / Touch Count:</strong> ${sess.visit_count || t.visit_count || 1}<br>
+                        <strong>First Visit:</strong> ${sess.is_first_visit ? 'Yes (New Visitor)' : 'No'} | <strong>Returning User:</strong> ${sess.is_returning_user ? 'Yes' : 'No'}
                     </div>
                 </div>
+
                 <div class="tree-node">
-                    <div style="font-weight:700; color:#ffffff; margin-bottom:4px;">🌍 Location Intelligence</div>
+                    <div style="font-weight:700; color:var(--accent-orange); margin-bottom:4px;">🎯 Attribution & Click ID Vault</div>
                     <div class="tree-box">
-                        Detected IP Location: ${JSON.stringify(loc.detected || {})}<br>
-                        GPS Permission Location: ${JSON.stringify(loc.provided || 'None Provided')}
+                        <strong>Channel Grouping:</strong> ${attr.channel_group || t.current_visit?.channel_group || 'Direct'}<br>
+                        <strong>First Touch Source:</strong> ${attr.first_touch_source || 'direct'} | <strong>First Touch Campaign:</strong> ${attr.first_touch_campaign || 'direct'}<br>
+                        <strong>UTM Parameters:</strong> ${JSON.stringify(attr.utms || t.current_visit?.utms || {})}<br>
+                        <strong>Click IDs (gclid/fbclid/etc.):</strong> ${JSON.stringify(attr.click_ids || t.current_visit?.click_ids || {})}<br>
+                        <strong>Parameter Vault (Retained Parameters):</strong> ${JSON.stringify(params.vault || {})}
                     </div>
                 </div>
+
                 <div class="tree-node">
-                    <div style="font-weight:700; color:#ffffff; margin-bottom:4px;">📄 Content & DOM Telemetry</div>
+                    <div style="font-weight:700; color:#ffffff; margin-bottom:4px;">📄 Page & Content Telemetry</div>
                     <div class="tree-box">
-                        Page Title: ${meta.page_title || 'N/A'}<br>
-                        Page URL: ${meta.page_location || 'N/A'}<br>
-                        H1 Heading: ${meta.heading_h1 || 'N/A'}<br>
-                        Meta Description: ${meta.description || 'N/A'}
+                        <strong>Page Title:</strong> ${meta.page_title || 'N/A'}<br>
+                        <strong>Page Location (URL):</strong> ${meta.page_location || 'N/A'}<br>
+                        <strong>Page Path:</strong> ${meta.page_path || '/'}<br>
+                        <strong>Main H1 Heading:</strong> ${meta.heading_h1 || 'N/A'}<br>
+                        <strong>All H1 Texts:</strong> ${JSON.stringify(meta.all_h1_texts || [])}<br>
+                        <strong>Meta Description:</strong> ${meta.description || 'N/A'}<br>
+                        <strong>Meta Keywords:</strong> ${meta.keywords || 'N/A'} | <strong>Author:</strong> ${meta.author || 'N/A'}<br>
+                        <strong>Canonical URL:</strong> ${meta.canonical_url || 'N/A'} | <strong>Favicon URL:</strong> ${meta.favicon_url || 'N/A'}
+                    </div>
+                </div>
+
+                <div class="tree-node">
+                    <div style="font-weight:700; color:var(--accent-cyan); margin-bottom:4px;">💬 Social OpenGraph & Meta Tags</div>
+                    <div class="tree-box">
+                        <strong>og:title:</strong> ${social.og_title || 'N/A'}<br>
+                        <strong>og:type:</strong> ${social.og_type || 'N/A'} | <strong>og:site_name:</strong> ${social.og_site_name || 'N/A'}<br>
+                        <strong>og:image:</strong> ${social.og_image || 'N/A'}<br>
+                        <strong>og:url:</strong> ${social.og_url || 'N/A'}<br>
+                        <strong>twitter:card:</strong> ${social.twitter_card || 'N/A'} | <strong>twitter:title:</strong> ${social.twitter_title || 'N/A'}
+                    </div>
+                </div>
+
+                <div class="tree-node">
+                    <div style="font-weight:700; color:var(--accent-indigo); margin-bottom:4px;">🧩 Schema.org & DOM Metrics</div>
+                    <div class="tree-box">
+                        <strong>Schema JSON-LD Types:</strong> ${schema.types_list || 'None detected'}<br>
+                        <strong>JSON-LD Schemas Data:</strong> ${JSON.stringify(schema.json_ld || [])}<br>
+                        <strong>DOM Metrics:</strong> H1 Count: ${dom.total_h1_count || 0} | H2 Count: ${dom.total_h2_count || 0} | Links: ${dom.total_links_count || 0} | Images: ${dom.total_images_count || 0} | Forms: ${dom.total_forms_count || 0} | Total DOM Nodes: ${dom.dom_nodes_count || 0}
+                    </div>
+                </div>
+
+                <div class="tree-node">
+                    <div style="font-weight:700; color:var(--accent-amber); margin-bottom:4px;">🖥️ Device & Hardware Diagnostics</div>
+                    <div class="tree-box">
+                        <strong>Device Category:</strong> ${dev.category || 'Desktop'}<br>
+                        <strong>OS Name:</strong> ${dev.os_name || 'N/A'} | <strong>Browser Name:</strong> ${dev.browser_name || 'N/A'}<br>
+                        <strong>Screen Resolution:</strong> ${dev.screen_resolution || 'N/A'} | <strong>Viewport Size:</strong> ${dev.viewport_size || 'N/A'}<br>
+                        <strong>Device Memory (RAM GB):</strong> ${dev.device_memory_gb || 'N/A'} GB | <strong>CPU Cores:</strong> ${dev.hardware_concurrency || 'N/A'} Cores<br>
+                        <strong>Connection Type:</strong> ${dev.connection_type || 'unknown'}
+                    </div>
+                </div>
+
+                <div class="tree-node">
+                    <div style="font-weight:700; color:var(--accent-green); margin-bottom:4px;">🌍 Location Intelligence</div>
+                    <div class="tree-box">
+                        <strong>Detected IP Address:</strong> ${log.ip_address || '127.0.0.1'}<br>
+                        <strong>Server Detected Location:</strong> ${JSON.stringify(loc.detected || {})}<br>
+                        <strong>GPS Permission Location:</strong> ${JSON.stringify(loc.provided || 'None Provided')}<br>
+                        <strong>Timezone:</strong> ${loc.timezone || 'N/A'} (Offset: ${loc.timezone_offset_hours || 0} hrs)<br>
+                        <strong>Location Source:</strong> ${loc.location_source || 'N/A'} | <strong>Permission Status:</strong> ${loc.permission_status || 'prompt'}
+                    </div>
+                </div>
+
+                <div class="tree-node">
+                    <div style="font-weight:700; color:var(--text-secondary); margin-bottom:4px;">⚡ Performance & Server Diagnostics</div>
+                    <div class="tree-box">
+                        <strong>Client Script Execution Time:</strong> ${perf.execution_time_ms || 0.4} ms<br>
+                        <strong>Server Response Time:</strong> ${serv.execution_time_ms || 0} ms<br>
+                        <strong>Server Hostname:</strong> ${serv.server_hostname || 'N/A'} | <strong>Server Software:</strong> ${serv.server_software || 'Apache'}<br>
+                        <strong>PHP Version:</strong> ${serv.php_version || '8.x'} | <strong>Memory Usage:</strong> ${serv.memory_usage_mb || 0} MB
+                    </div>
+                </div>
+
+                <div class="tree-node">
+                    <div style="font-weight:700; color:var(--primary); margin-bottom:4px;">🔍 Raw JSON Data Layer Push Payload</div>
+                    <div class="tree-box" style="overflow-x:auto;">
+                        <pre style="margin:0; font-family:var(--font-mono); font-size:11px; color:var(--primary);">${JSON.stringify(t, null, 2)}</pre>
                     </div>
                 </div>
             `;
