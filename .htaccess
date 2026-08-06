@@ -1,5 +1,4 @@
-# Po'Boy's Data Layer Strict Security Policy
-Options -Indexes
+# Po'Boy Server Side Analytics Security Policy
 
 # Protect Sensitive Log Files & SQLite Databases from Direct Public HTTP Download
 <FilesMatch "\.(sqlite|jsonl|bak|db|gitkeep)$">

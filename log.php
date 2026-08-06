@@ -27,15 +27,20 @@ function getDBConnection() {
     static $pdo = null;
     if ($pdo !== null) return $pdo;
 
+    if (!class_exists('PDO')) return null;
+
     try {
-        if (DB_DRIVER === 'mysql') {
-            $dsn = "mysql:host=" . MYSQL_HOST . ";port=" . MYSQL_PORT . ";dbname=" . MYSQL_DB . ";charset=utf8mb4";
+        $driver = defined('DB_DRIVER') ? DB_DRIVER : 'sqlite';
+        if ($driver === 'mysql' && defined('MYSQL_HOST')) {
+            $dsn = "mysql:host=" . MYSQL_HOST . ";port=" . (defined('MYSQL_PORT') ? MYSQL_PORT : 3306) . ";dbname=" . MYSQL_DB . ";charset=utf8mb4";
             $pdo = new PDO($dsn, MYSQL_USER, MYSQL_PASS, [
                 PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
                 PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC
             ]);
         } else {
-            $pdo = new PDO("sqlite:" . SQLITE_PATH, null, null, [
+            if (!in_array('sqlite', PDO::getAvailableDrivers())) return null;
+            $sqlitePath = defined('POBOY_DB_PATH') ? POBOY_DB_PATH : (defined('SQLITE_PATH') ? SQLITE_PATH : __DIR__ . '/logs/poboy.sqlite');
+            $pdo = new PDO("sqlite:" . $sqlitePath, null, null, [
                 PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
                 PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC
             ]);
