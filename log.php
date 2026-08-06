@@ -183,7 +183,9 @@ function getIPLocation($ip) {
 
 // FETCH LOGS FOR DASHBOARD
 if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['action']) && $_GET['action'] === 'fetch') {
-    session_start();
+    if (session_status() === PHP_SESSION_NONE) {
+        session_start();
+    }
     $authPass = $_GET['password'] ?? ($_SESSION['sc_authenticated'] ?? '');
     
     if ($authPass !== DASHBOARD_PASSWORD && ($_SESSION['sc_authenticated'] ?? false) !== true) {
@@ -195,40 +197,44 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['action']) && $_GET['act
     header('Content-Type: application/json');
     $pdo = getDBConnection();
     $max = isset($_GET['limit']) ? intval($_GET['limit']) : 5000;
+    if ($max <= 0) $max = 5000;
 
     $startDate = $_GET['start_date'] ?? null;
     $endDate = $_GET['end_date'] ?? null;
 
     if ($pdo) {
-        $sql = "SELECT telemetry_json FROM poboy_events WHERE 1=1";
-        $params = [];
+        try {
+            $sql = "SELECT telemetry_json FROM poboy_events WHERE 1=1";
+            $params = [];
 
-        if ($startDate) {
-            $sql .= " AND server_timestamp >= :start_ts";
-            $params[':start_ts'] = strtotime($startDate . ' 00:00:00');
-        }
-        if ($endDate) {
-            $sql .= " AND server_timestamp <= :end_ts";
-            $params[':end_ts'] = strtotime($endDate . ' 23:59:59');
-        }
+            if ($startDate) {
+                $sql .= " AND server_timestamp >= :start_ts";
+                $params[':start_ts'] = strtotime($startDate . ' 00:00:00');
+            }
+            if ($endDate) {
+                $sql .= " AND server_timestamp <= :end_ts";
+                $params[':end_ts'] = strtotime($endDate . ' 23:59:59');
+            }
 
-        $sql .= " ORDER BY server_timestamp DESC LIMIT :limit";
-        $stmt = $pdo->prepare($sql);
-        
-        foreach ($params as $key => $val) {
-            $stmt->bindValue($key, $val, PDO::PARAM_INT);
+            $sql .= " ORDER BY server_timestamp DESC LIMIT " . intval($max);
+            $stmt = $pdo->prepare($sql);
+            
+            foreach ($params as $key => $val) {
+                $stmt->bindValue($key, $val, PDO::PARAM_INT);
+            }
+            $stmt->execute();
+            
+            $rows = $stmt->fetchAll();
+            $records = [];
+            foreach ($rows as $row) {
+                $decoded = json_decode($row['telemetry_json'], true);
+                if ($decoded) $records[] = $decoded;
+            }
+            echo json_encode($records);
+            exit();
+        } catch (Exception $e) {
+            // Fallthrough to file log reading on DB exception
         }
-        $stmt->bindValue(':limit', $max, PDO::PARAM_INT);
-        $stmt->execute();
-        
-        $rows = $stmt->fetchAll();
-        $records = [];
-        foreach ($rows as $row) {
-            $decoded = json_decode($row['telemetry_json'], true);
-            if ($decoded) $records[] = $decoded;
-        }
-        echo json_encode($records);
-        exit();
     } else {
         if (!file_exists(LOG_FILE_PATH)) {
             echo json_encode([]);

@@ -415,12 +415,12 @@ $isAuthenticated = $_SESSION['sc_authenticated'] ?? false;
 
     <!-- NAVIGATION TABS -->
     <nav class="ga4-nav-tabs">
-        <button class="nav-tab active" onclick="showSection('overview')">🏠 Realtime Overview</button>
-        <button class="nav-tab" onclick="showSection('userscope')">👤 User Scope (Visitor Lifetime)</button>
-        <button class="nav-tab" onclick="showSection('sessionscope')">⏱️ Session Scope (30-Min Window)</button>
-        <button class="nav-tab" onclick="showSection('eventscope')">⚡ Event Scope (Hits & Content)</button>
-        <button class="nav-tab" onclick="showSection('location')">🗺️ Geographic Intelligence</button>
-        <button class="nav-tab" onclick="showSection('query')">🎛️ Scoped Query Builder & Export</button>
+        <button class="nav-tab active" onclick="showSection('overview', this)">🏠 Realtime Overview</button>
+        <button class="nav-tab" onclick="showSection('userscope', this)">👤 User Scope (Visitor Lifetime)</button>
+        <button class="nav-tab" onclick="showSection('sessionscope', this)">⏱️ Session Scope (30-Min Window)</button>
+        <button class="nav-tab" onclick="showSection('eventscope', this)">⚡ Event Scope (Hits & Content)</button>
+        <button class="nav-tab" onclick="showSection('location', this)">🗺️ Geographic Intelligence</button>
+        <button class="nav-tab" onclick="showSection('query', this)">🎛️ Scoped Query Builder & Export</button>
     </nav>
 
     <main class="ga4-body">
@@ -723,11 +723,12 @@ $isAuthenticated = $_SESSION['sc_authenticated'] ?? false;
             { id: 'device_category', name: 'Device Category (Session Scope)' }
         ];
 
-        function showSection(secId) {
+        function showSection(secId, btn) {
             document.querySelectorAll('.section-block').forEach(el => el.style.display = 'none');
             document.querySelectorAll('.nav-tab').forEach(el => el.classList.remove('active'));
-            document.getElementById(`sec-${secId}`).style.display = 'block';
-            event.currentTarget.classList.add('active');
+            const target = document.getElementById(`sec-${secId}`);
+            if (target) target.style.display = 'block';
+            if (btn) btn.classList.add('active');
 
             if (secId === 'location') {
                 setTimeout(initMap, 200);
@@ -787,12 +788,12 @@ $isAuthenticated = $_SESSION['sc_authenticated'] ?? false;
             if (end) url += `&end_date=${end}`;
 
             try {
-                const res = await fetch(url);
-                if (!res.ok) throw new Error('Failed to fetch telemetry logs');
+                const res = await fetch(url, { credentials: 'same-origin' });
+                if (!res.ok) throw new Error(`HTTP ${res.status} Error fetching telemetry logs`);
                 rawLogs = await res.json();
                 applyRules();
             } catch (err) {
-                document.getElementById('table-stream').innerHTML = `<tr><td colspan="6" style="text-align:center; color:#f43f5e; padding:30px;">Error loading logs: ${err.message}</td></tr>`;
+                document.getElementById('table-stream').innerHTML = `<tr><td colspan="6" style="text-align:center; color:#f43f5e; padding:30px;">Error loading telemetry stream: ${err.message}</td></tr>`;
             }
         }
 
@@ -925,6 +926,8 @@ $isAuthenticated = $_SESSION['sc_authenticated'] ?? false;
                 const uScope = t.user_scope || {};
                 const sScope = t.session_scope || {};
                 const eScope = t.event_scope || {};
+                const ident = t.identity || uScope;
+                const sess = t.session || sScope;
                 const dev = t.device || sScope.device || {};
                 const meta = t.meta || eScope.meta || {};
                 const schema = t.schema || eScope.schema || {};
@@ -1156,6 +1159,7 @@ $isAuthenticated = $_SESSION['sc_authenticated'] ?? false;
                     const uScope = t.user_scope || {};
                     const sScope = t.session_scope || {};
                     const eScope = t.event_scope || {};
+                    const meta = t.meta || eScope.meta || {};
 
                     const handle = uScope.friendly_handle || rawP.friendly_username || t.friendly_username || 'Visitor';
                     const uid = uScope.user_id || rawP.user_id || t.user_id || 'pb_anon';
