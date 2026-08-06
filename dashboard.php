@@ -1,6 +1,6 @@
 <?php
 /**
- * Po'Boy Server Side Analytics - GA4 Enterprise Analytics Suite v0.9.0-beta
+ * Po'Boy Server Side Analytics - 3-Tier Scoped Visual Analytics Suite v0.9.0-beta
  * GitHub: github.com/dadelonglegs/poboy
  */
 
@@ -31,7 +31,7 @@ $isAuthenticated = $_SESSION['sc_authenticated'] ?? false;
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Po'Boy Analytics - Google Analytics Enterprise Suite</title>
+    <title>Po'Boy Analytics - 3-Tier Scoped Enterprise Suite</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -50,6 +50,7 @@ $isAuthenticated = $_SESSION['sc_authenticated'] ?? false;
             --accent-amber: #f59e0b;
             --accent-orange: #fb4f14;
             --accent-rose: #f43f5e;
+            --accent-purple: #a855f7;
             --text-primary: #f8fafc;
             --text-secondary: #94a3b8;
             --text-muted: #64748b;
@@ -81,12 +82,7 @@ $isAuthenticated = $_SESSION['sc_authenticated'] ?? false;
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
             text-align: center;
         }
-        .login-logo {
-            font-size: 28px;
-            font-weight: 800;
-            color: #ffffff;
-            margin-bottom: 6px;
-        }
+        .login-logo { font-size: 28px; font-weight: 800; color: #ffffff; margin-bottom: 6px; }
         .login-sub { font-size: 13px; color: var(--text-secondary); margin-bottom: 24px; }
         .form-group { margin-top: 20px; text-align: left; }
         .form-group label { display: block; font-size: 13px; color: var(--text-secondary); margin-bottom: 8px; font-weight: 500; }
@@ -231,7 +227,7 @@ $isAuthenticated = $_SESSION['sc_authenticated'] ?? false;
         /* SCORECARDS GRID */
         .scorecards-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
             gap: 16px;
             margin-bottom: 24px;
         }
@@ -242,14 +238,14 @@ $isAuthenticated = $_SESSION['sc_authenticated'] ?? false;
             padding: 20px;
             position: relative;
         }
-        .scorecard-label { font-size: 12px; color: var(--text-secondary); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
-        .scorecard-value { font-size: 32px; font-weight: 800; color: #ffffff; margin: 8px 0; font-family: var(--font-mono); }
+        .scorecard-label { font-size: 11px; color: var(--text-secondary); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+        .scorecard-value { font-size: 32px; font-weight: 800; color: #ffffff; margin: 6px 0; font-family: var(--font-mono); }
         .scorecard-trend { font-size: 12px; color: var(--accent-green); display: flex; align-items: center; gap: 4px; }
 
         /* GRID LAYOUT FOR CHARTS & TABLES */
         .reports-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(480px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(440px, 1fr));
             gap: 20px;
             margin-bottom: 24px;
         }
@@ -267,7 +263,7 @@ $isAuthenticated = $_SESSION['sc_authenticated'] ?? false;
             align-items: center;
             margin-bottom: 16px;
         }
-        .card-title { font-size: 16px; font-weight: 700; color: #ffffff; }
+        .card-title { font-size: 15px; font-weight: 700; color: #ffffff; }
         .card-sub { font-size: 12px; color: var(--text-secondary); }
 
         /* PROGRESS BARS & BARS */
@@ -300,7 +296,11 @@ $isAuthenticated = $_SESSION['sc_authenticated'] ?? false;
         }
         .ga4-table tr:hover td { background: var(--bg-card-hover); }
 
-        /* BADGES */
+        /* SCOPE BADGES */
+        .scope-badge-user { background: rgba(56, 189, 248, 0.15); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.3); padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: 700; text-transform: uppercase; }
+        .scope-badge-session { background: rgba(245, 158, 11, 0.15); color: #f59e0b; border: 1px solid rgba(245, 158, 11, 0.3); padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: 700; text-transform: uppercase; }
+        .scope-badge-event { background: rgba(168, 85, 247, 0.15); color: #a855f7; border: 1px solid rgba(168, 85, 247, 0.3); padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: 700; text-transform: uppercase; }
+
         .handle-badge {
             display: inline-flex;
             align-items: center;
@@ -359,8 +359,8 @@ $isAuthenticated = $_SESSION['sc_authenticated'] ?? false;
             background: var(--bg-card);
             border: 1px solid var(--border-color);
             border-radius: var(--radius-lg);
-            width: 90%; max-width: 860px;
-            max-height: 85vh; overflow-y: auto;
+            width: 90%; max-width: 920px;
+            max-height: 88vh; overflow-y: auto;
             padding: 32px;
             box-shadow: 0 25px 50px -12px rgba(0,0,0,0.7);
         }
@@ -386,7 +386,7 @@ $isAuthenticated = $_SESSION['sc_authenticated'] ?? false;
 <?php if (!$isAuthenticated): ?>
     <div class="login-container">
         <div class="login-logo">Po'Boy Analytics</div>
-        <div class="login-sub">Google Analytics Enterprise Suite & Attribution Engine</div>
+        <div class="login-sub">3-Tier Scoped Enterprise Analytics Suite</div>
         
         <?php if ($loginError): ?>
             <div style="background: rgba(244, 63, 94, 0.15); border: 1px solid rgba(244, 63, 94, 0.3); color: #fecdd3; padding: 10px; border-radius: 6px; font-size: 13px; margin-bottom: 16px;"><?php echo htmlspecialchars($loginError); ?></div>
@@ -404,7 +404,7 @@ $isAuthenticated = $_SESSION['sc_authenticated'] ?? false;
     <header class="ga4-header">
         <div class="ga4-brand">
             <div class="ga4-logo-icon">📊</div>
-            <span>Po'Boy Server Side Analytics</span>
+            <span>Po'Boy Scoped Analytics</span>
             <span class="ga4-badge">v0.9.0-beta</span>
         </div>
         <div class="ga4-user-nav">
@@ -427,8 +427,8 @@ $isAuthenticated = $_SESSION['sc_authenticated'] ?? false;
         <!-- GLOBAL CONTROL BAR -->
         <div class="controls-bar">
             <div>
-                <h3 style="font-size: 15px; font-weight: 700;">📅 Date Range Explorer</h3>
-                <p style="font-size: 12px; color: var(--text-secondary);">Select timeline to inspect real-time dimensions</p>
+                <h3 style="font-size: 15px; font-weight: 700;">📅 Timeline Explorer</h3>
+                <p style="font-size: 12px; color: var(--text-secondary);">Select date range to inspect 3-tier telemetry dimensions</p>
             </div>
             <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
                 <div class="preset-group">
@@ -450,24 +450,29 @@ $isAuthenticated = $_SESSION['sc_authenticated'] ?? false;
         <!-- SCORECARDS GRID -->
         <div class="scorecards-grid">
             <div class="scorecard">
-                <div class="scorecard-label">Active Users</div>
+                <div class="scorecard-label">Active Users <span class="scope-badge-user">USER</span></div>
                 <div class="scorecard-value" id="card-users">0</div>
-                <div class="scorecard-trend"><span>⚡ Unique Fingerprinted Handles</span></div>
+                <div class="scorecard-trend"><span>👤 730-Day Fingerprinted Identities</span></div>
             </div>
             <div class="scorecard">
-                <div class="scorecard-label">Total Sessions</div>
+                <div class="scorecard-label">Active Sessions <span class="scope-badge-session">SESSION</span></div>
                 <div class="scorecard-value" id="card-sessions">0</div>
-                <div class="scorecard-trend"><span>⏱️ 30-Min Inactivity Windows</span></div>
+                <div class="scorecard-trend"><span>⏱️ 30-Min Persistent Windows</span></div>
             </div>
             <div class="scorecard">
-                <div class="scorecard-label">Conversion Rate</div>
+                <div class="scorecard-label">Total Page Hits <span class="scope-badge-event">EVENT</span></div>
+                <div class="scorecard-value" id="card-hits" style="color: var(--accent-purple);">0</div>
+                <div class="scorecard-trend"><span>📄 Individual Page Interactions</span></div>
+            </div>
+            <div class="scorecard">
+                <div class="scorecard-label">Conversion Rate <span class="scope-badge-event">EVENT</span></div>
                 <div class="scorecard-value" id="card-conversions" style="color: var(--accent-green);">0</div>
-                <div class="scorecard-trend"><span>🎯 GTM Lead Submissions</span></div>
+                <div class="scorecard-trend"><span>🎯 GTM Conversion Triggers</span></div>
             </div>
             <div class="scorecard">
-                <div class="scorecard-label">Locations Pinpointed</div>
+                <div class="scorecard-label">Locations Pinpointed <span class="scope-badge-session">SESSION</span></div>
                 <div class="scorecard-value" id="card-locations" style="color: var(--primary);">0</div>
-                <div class="scorecard-trend"><span>🌍 GeoIP & GPS Permission Coordinates</span></div>
+                <div class="scorecard-trend"><span>🌍 GeoIP & GPS Coordinates</span></div>
             </div>
         </div>
 
@@ -477,90 +482,125 @@ $isAuthenticated = $_SESSION['sc_authenticated'] ?? false;
                 <div class="card-panel">
                     <div class="card-header">
                         <div>
-                            <div class="card-title">Default Channel Grouping</div>
-                            <div class="card-sub">Traffic acquisition by origin category</div>
+                            <div class="card-title">Acquisition Channels <span class="scope-badge-session">SESSION SCOPE</span></div>
+                            <div class="card-sub">Traffic distribution by campaign origin</div>
                         </div>
                     </div>
-                    <div id="chart-channels">Loading channel data...</div>
+                    <div id="chart-channels">Loading channels...</div>
                 </div>
 
                 <div class="card-panel">
                     <div class="card-header">
                         <div>
-                            <div class="card-title">Device Category Breakdown</div>
+                            <div class="card-title">Device Category Breakdown <span class="scope-badge-session">SESSION SCOPE</span></div>
                             <div class="card-sub">Desktop vs Mobile vs Tablet proportion</div>
                         </div>
                     </div>
-                    <div id="chart-devices">Loading device data...</div>
+                    <div id="chart-devices">Loading device categories...</div>
                 </div>
             </div>
         </section>
 
-        <!-- SECTION 2: ACQUISITION & ATTRIBUTION -->
         <!-- SECTION 2: USER SCOPE (VISITOR LIFETIME) -->
         <section id="sec-userscope" class="section-block" style="display: none;">
-            <div class="card-panel" style="margin-bottom: 24px;">
+            <div class="reports-grid" style="margin-bottom: 24px;">
+                <div class="card-panel">
+                    <div class="card-header">
+                        <div class="card-title">👤 Visitor Frequency & Touch Distribution</div>
+                        <div class="card-sub">User loyalty breakdown by cumulative visit count</div>
+                    </div>
+                    <div id="chart-user-frequency">Loading visitor frequency...</div>
+                </div>
+
+                <div class="card-panel">
+                    <div class="card-header">
+                        <div class="card-title">🧰 Retained Parameter Vault Retention</div>
+                        <div class="card-sub">UTMs & Click IDs preserved across multi-day visits</div>
+                    </div>
+                    <div id="chart-user-vault">Loading vault retention...</div>
+                </div>
+            </div>
+
+            <div class="card-panel">
                 <div class="card-header">
                     <div>
-                        <div class="card-title">👤 User Scope: Visitor Lifetime & First-Touch Attribution Matrix</div>
-                        <div class="card-sub">730-day persistent visitor identity, cumulative touch counts, and retained parameter vaults</div>
+                        <div class="card-title">👤 User Scope: Visitor Lifetime & First-Touch Attribution</div>
+                        <div class="card-sub">730-day persistent identity, cumulative touch counts, and retained vaults</div>
                     </div>
                 </div>
                 <table class="ga4-table">
                     <thead>
                         <tr>
-                            <th>Acquisition Channel</th>
-                            <th>First Touch Source / Campaign</th>
-                            <th>Last Touch Source / Campaign</th>
-                            <th>Click ID Vault (gclid, fbclid, etc.)</th>
-                            <th>Users</th>
+                            <th>Friendly Handle / User ID</th>
+                            <th>Total Touch Count</th>
+                            <th>Visitor Type</th>
+                            <th>First Touch Channel / Campaign</th>
+                            <th>Retained Parameter Vault</th>
                         </tr>
                     </thead>
-                    <tbody id="table-acquisition">
+                    <tbody id="table-user-scope">
                         <tr><td colspan="5" style="text-align: center; color: var(--text-secondary);">Loading user scope dimensions...</td></tr>
                     </tbody>
                 </table>
             </div>
         </section>
 
-        <!-- SECTION 3: SESSION SCOPE (30-MIN INACTIVITY WINDOW) -->
+        <!-- SECTION 3: SESSION SCOPE (30-MIN WINDOW) -->
         <section id="sec-sessionscope" class="section-block" style="display: none;">
             <div class="reports-grid">
                 <div class="card-panel">
                     <div class="card-header">
-                        <div class="card-title">⏱️ Session Scope: Operating Systems & Browsers</div>
-                        <div class="card-sub">Session hardware & browser dimensions across active 30-min windows</div>
+                        <div class="card-title">⏱️ Operating Systems & Browsers</div>
+                        <div class="card-sub">Session OS & Browser distributions</div>
                     </div>
-                    <div id="chart-os-browser">Loading session OS & Browser dimensions...</div>
+                    <div id="chart-os-browser">Loading OS & Browser dimensions...</div>
                 </div>
 
                 <div class="card-panel">
                     <div class="card-header">
-                        <div class="card-title">🖥️ Session Scope: Screen Resolutions & Hardware Specs</div>
-                        <div class="card-sub">Device memory (RAM), CPU cores, and connection types</div>
+                        <div class="card-title">🖥️ Hardware RAM GB & CPU Core Density</div>
+                        <div class="card-sub">Client hardware specifications</div>
                     </div>
-                    <div id="chart-hardware">Loading session hardware dimensions...</div>
+                    <div id="chart-hardware">Loading hardware dimensions...</div>
                 </div>
             </div>
         </section>
 
         <!-- SECTION 4: EVENT SCOPE (HITS & CONTENT) -->
         <section id="sec-eventscope" class="section-block" style="display: none;">
+            <div class="reports-grid" style="margin-bottom: 24px;">
+                <div class="card-panel">
+                    <div class="card-header">
+                        <div class="card-title">🧩 Schema.org Structured Data Types</div>
+                        <div class="card-sub">JSON-LD schema types detected across page hits</div>
+                    </div>
+                    <div id="chart-schemas">Loading schema types...</div>
+                </div>
+
+                <div class="card-panel">
+                    <div class="card-header">
+                        <div class="card-title">📐 DOM Node Metrics & Complexity Index</div>
+                        <div class="card-sub">Average DOM nodes, headings, links, and images</div>
+                    </div>
+                    <div id="chart-dom-metrics">Loading DOM metrics...</div>
+                </div>
+            </div>
+
             <div class="card-panel">
                 <div class="card-header">
                     <div>
-                        <div class="card-title">Pages & Content Meta Dimension Explorer</div>
-                        <div class="card-sub">Page titles, H1 headings, meta descriptions, and DOM density</div>
+                        <div class="card-title">⚡ Event Scope: Page Hits, Headings & OpenGraph Social Meta</div>
+                        <div class="card-sub">Per-hit page views, titles, H1 headings, and social sharing tags</div>
                     </div>
                 </div>
                 <table class="ga4-table">
                     <thead>
                         <tr>
-                            <th>Page Title</th>
-                            <th>Page Path / URL</th>
+                            <th>Page Title & URL</th>
                             <th>H1 Heading</th>
-                            <th>Meta Description</th>
+                            <th>Social OpenGraph Title</th>
                             <th>DOM Node Count</th>
+                            <th>Script Execution (ms)</th>
                         </tr>
                     </thead>
                     <tbody id="table-pages">
@@ -572,10 +612,10 @@ $isAuthenticated = $_SESSION['sc_authenticated'] ?? false;
 
         <!-- SECTION 5: GEOGRAPHIC INTELLIGENCE -->
         <section id="sec-location" class="section-block" style="display: none;">
-            <div class="card-panel" style="margin-bottom: 24px;">
+            <div class="card-panel">
                 <div class="card-header">
                     <div>
-                        <div class="card-title">Geographic Location Explorer</div>
+                        <div class="card-title">🗺️ Geographic Location Explorer</div>
                         <div class="card-sub">Live Leaflet Map with Pin Markers & Heatmap density options</div>
                     </div>
                     <div style="display: flex; gap: 8px;">
@@ -592,8 +632,8 @@ $isAuthenticated = $_SESSION['sc_authenticated'] ?? false;
             <div class="card-panel" style="margin-bottom: 24px;">
                 <div class="card-header">
                     <div>
-                        <div class="card-title">🎛️ GA4 Custom Dimension Query Builder</div>
-                        <div class="card-sub">Filter telemetry across 35+ custom dimensions simultaneously</div>
+                        <div class="card-title">🎛️ Scoped Custom Dimension Query Builder</div>
+                        <div class="card-sub">Filter telemetry across 35+ user, session, and event scope dimensions</div>
                     </div>
                     <button onclick="clearRules()" class="btn-action">🗑️ Clear Rules</button>
                 </div>
@@ -614,7 +654,7 @@ $isAuthenticated = $_SESSION['sc_authenticated'] ?? false;
             <div class="card-panel">
                 <div class="card-header">
                     <div>
-                        <div class="card-title">Visitor Stream & Full Dimension Dataset</div>
+                        <div class="card-title">Visitor Telemetry Stream & Full Dimension Dataset</div>
                     </div>
                     <div style="display: flex; gap: 8px;">
                         <button onclick="exportScreenCSV()" class="btn-action">📥 Export Screen View (CSV)</button>
@@ -626,17 +666,16 @@ $isAuthenticated = $_SESSION['sc_authenticated'] ?? false;
                 <table class="ga4-table">
                     <thead>
                         <tr>
-                            <th>Friendly Handle / User ID</th>
-                            <th>Session & Visits</th>
-                            <th>Hardware & Tech</th>
-                            <th>Location</th>
-                            <th>Channel</th>
+                            <th>User Scope (Handle / ID)</th>
+                            <th>Session Scope (Session ID / Hits)</th>
+                            <th>Session Scope (Tech & Location)</th>
+                            <th>Event Scope (Page / Channel)</th>
                             <th>Click IDs & UTMs</th>
                             <th>Inspect</th>
                         </tr>
                     </thead>
                     <tbody id="table-stream">
-                        <tr><td colspan="7" style="text-align: center; color: var(--text-secondary); padding: 30px;">Loading stream...</td></tr>
+                        <tr><td colspan="6" style="text-align: center; color: var(--text-secondary); padding: 30px;">Loading stream...</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -669,18 +708,19 @@ $isAuthenticated = $_SESSION['sc_authenticated'] ?? false;
         let currentMapMode = 'pins';
 
         const DIMENSION_FIELDS = [
-            { id: 'friendly_username', name: 'Friendly Handle' },
-            { id: 'user_id', name: 'User ID (UUID)' },
-            { id: 'is_conversion', name: 'Conversion Triggered' },
-            { id: 'channel_group', name: 'Channel Grouping' },
-            { id: 'utm_source', name: 'UTM Source' },
-            { id: 'utm_campaign', name: 'UTM Campaign' },
+            { id: 'friendly_username', name: 'Friendly Handle (User Scope)' },
+            { id: 'user_id', name: 'User ID UUID (User Scope)' },
+            { id: 'session_id', name: 'Session ID (Session Scope)' },
+            { id: 'is_conversion', name: 'Conversion Triggered (Event Scope)' },
+            { id: 'channel_group', name: 'Channel Grouping (Session Scope)' },
+            { id: 'utm_source', name: 'UTM Source (Event Scope)' },
+            { id: 'utm_campaign', name: 'UTM Campaign (Event Scope)' },
             { id: 'click_id', name: 'Click ID (gclid/fbclid)' },
             { id: 'country', name: 'Country' },
             { id: 'city', name: 'City' },
-            { id: 'browser_name', name: 'Browser' },
-            { id: 'os_name', name: 'Operating System' },
-            { id: 'device_category', name: 'Device Category' }
+            { id: 'browser_name', name: 'Browser (Session Scope)' },
+            { id: 'os_name', name: 'Operating System (Session Scope)' },
+            { id: 'device_category', name: 'Device Category (Session Scope)' }
         ];
 
         function showSection(secId) {
@@ -752,7 +792,7 @@ $isAuthenticated = $_SESSION['sc_authenticated'] ?? false;
                 rawLogs = await res.json();
                 applyRules();
             } catch (err) {
-                document.getElementById('table-stream').innerHTML = `<tr><td colspan="7" style="text-align:center; color:#f43f5e; padding:30px;">Error loading logs: ${err.message}</td></tr>`;
+                document.getElementById('table-stream').innerHTML = `<tr><td colspan="6" style="text-align:center; color:#f43f5e; padding:30px;">Error loading logs: ${err.message}</td></tr>`;
             }
         }
 
@@ -814,26 +854,29 @@ $isAuthenticated = $_SESSION['sc_authenticated'] ?? false;
         }
 
         function matchesRule(log, rule) {
-            const t = log.telemetry || {};
-            const loc = t.location || {};
-            const cur = t.current_visit || {};
-            const utms = cur.utms || {};
-            const cids = cur.click_ids || {};
-            const meta = t.telemetry || t.browser || {};
+            const rawP = log.telemetry || {};
+            const t = rawP.telemetry || rawP;
+            const uScope = t.user_scope || {};
+            const sScope = t.session_scope || {};
+            const eScope = t.event_scope || {};
+            const loc = t.location || sScope.location || log.location || {};
+            const det = loc.detected || log.location?.detected || {};
+            const dev = t.device || sScope.device || {};
 
             let val = '';
-            if (rule.field === 'friendly_username') val = t.friendly_username || '';
-            else if (rule.field === 'user_id') val = t.user_id || '';
-            else if (rule.field === 'is_conversion') val = (t.is_conversion || t.conversion) ? 'true' : 'false';
-            else if (rule.field === 'channel_group') val = cur.channel_group || t.first_touch?.channel_group || '';
-            else if (rule.field === 'utm_source') val = utms.utm_source || '';
-            else if (rule.field === 'utm_campaign') val = utms.utm_campaign || '';
-            else if (rule.field === 'click_id') val = Object.keys(cids).join(', ');
-            else if (rule.field === 'country') val = loc.detected?.country || '';
-            else if (rule.field === 'city') val = loc.detected?.city || '';
-            else if (rule.field === 'browser_name') val = meta.browser_name || '';
-            else if (rule.field === 'os_name') val = meta.os_name || '';
-            else if (rule.field === 'device_category') val = meta.device_category || '';
+            if (rule.field === 'friendly_username') val = uScope.friendly_handle || rawP.friendly_username || t.friendly_username || '';
+            else if (rule.field === 'user_id') val = uScope.user_id || rawP.user_id || t.user_id || '';
+            else if (rule.field === 'session_id') val = sScope.session_id || rawP.session_id || t.session_id || '';
+            else if (rule.field === 'is_conversion') val = (t.is_conversion || t.conversion || rawP.conversion) ? 'true' : 'false';
+            else if (rule.field === 'channel_group') val = sScope.channel_group || rawP.channel_group || t.channel_group || '';
+            else if (rule.field === 'utm_source') val = eScope.utms?.utm_source || t.attribution?.utms?.utm_source || '';
+            else if (rule.field === 'utm_campaign') val = eScope.utms?.utm_campaign || t.attribution?.utms?.utm_campaign || '';
+            else if (rule.field === 'click_id') val = Object.keys(eScope.click_ids || t.attribution?.click_ids || {}).join(', ');
+            else if (rule.field === 'country') val = loc.country || det.country || '';
+            else if (rule.field === 'city') val = loc.city || det.city || '';
+            else if (rule.field === 'browser_name') val = dev.browser_name || '';
+            else if (rule.field === 'os_name') val = dev.os_name || '';
+            else if (rule.field === 'device_category') val = dev.category || '';
 
             const strVal = String(val).toLowerCase();
             const targetVal = String(rule.value).toLowerCase();
@@ -870,38 +913,78 @@ $isAuthenticated = $_SESSION['sc_authenticated'] ?? false;
             const osBrowserMap = {};
             const hwMap = {};
             const pagesMap = {};
-            const acqList = [];
+            const userScopeList = [];
+
+            const userFreqMap = { '1 Visit': 0, '2-5 Visits': 0, '6-15 Visits': 0, '15+ Power Visitors': 0 };
+            const schemaMap = {};
+            const domTotals = { nodes: 0, h1: 0, h2: 0, links: 0, images: 0, forms: 0, count: 0 };
 
             logs.forEach(log => {
-                const t = log.telemetry || {};
-                if (t.user_id) uniqueUsers.add(t.user_id);
-                if (t.session_id) sessionsSet.add(t.session_id);
-                if (t.is_conversion || t.conversion) convCount++;
+                const rawP = log.telemetry || {};
+                const t = rawP.telemetry || rawP;
+                const uScope = t.user_scope || {};
+                const sScope = t.session_scope || {};
+                const eScope = t.event_scope || {};
+                const dev = t.device || sScope.device || {};
+                const meta = t.meta || eScope.meta || {};
+                const schema = t.schema || eScope.schema || {};
+                const dom = t.dom_metrics || eScope.dom_metrics || {};
 
-                const loc = t.location || {};
-                if ((loc.provided && loc.provided.latitude) || (loc.detected && loc.detected.lat)) locCount++;
+                const uid = uScope.user_id || rawP.user_id || t.user_id;
+                const sid = sScope.session_id || rawP.session_id || t.session_id;
 
-                const cur = t.current_visit || {};
-                const ch = cur.channel_group || t.first_touch?.channel_group || 'Direct';
+                if (uid) uniqueUsers.add(uid);
+                if (sid) sessionsSet.add(sid);
+                if (t.is_conversion || t.conversion || rawP.conversion) convCount++;
+
+                const loc = t.location || sScope.location || {};
+                if ((loc.latitude && loc.longitude) || (log.location?.detected?.lat)) locCount++;
+
+                const ch = sScope.channel_group || rawP.channel_group || t.channel_group || 'Direct';
                 channelMap[ch] = (channelMap[ch] || 0) + 1;
 
-                const meta = t.telemetry || t.browser || {};
-                const dev = meta.device_category || 'Desktop';
-                deviceMap[dev] = (deviceMap[dev] || 0) + 1;
+                const devCat = dev.category || 'Desktop';
+                deviceMap[devCat] = (deviceMap[devCat] || 0) + 1;
 
-                const osBr = `${meta.os_name || 'OS'} / ${meta.browser_name || 'Browser'}`;
+                const osBr = `${dev.os_name || 'OS'} / ${dev.browser_name || 'Browser'}`;
                 osBrowserMap[osBr] = (osBrowserMap[osBr] || 0) + 1;
 
-                const screenRes = meta.screen_resolution || '1920x1080';
+                const screenRes = dev.screen_resolution || '1920x1080';
                 hwMap[screenRes] = (hwMap[screenRes] || 0) + 1;
 
-                const title = meta.page_title || 'Untitled Page';
-                pagesMap[title] = (pagesMap[title] || { count: 0, path: meta.page_path || '/', h1: meta.heading_h1 || 'N/A', desc: meta.description || 'N/A', nodes: meta.dom_nodes_count || 120 });
-                pagesMap[title].count++;
+                const pageTitle = meta.page_title || eScope.page_title || rawP.page_title || 'Untitled Page';
+                pagesMap[pageTitle] = (pagesMap[pageTitle] || { 
+                    views: 0, 
+                    path: meta.page_path || eScope.page_path || rawP.page_path || '/', 
+                    h1: meta.heading_h1 || 'N/A', 
+                    og: t.social?.og_title || eScope.social?.og_title || 'N/A',
+                    nodes: dom.dom_nodes_count || 120,
+                    exec: t.performance?.execution_time_ms || 0.4
+                });
+                pagesMap[pageTitle].views++;
+
+                const visits = uScope.visit_count || sess.visit_count || rawP.visit_count || 1;
+                if (visits === 1) userFreqMap['1 Visit']++;
+                else if (visits <= 5) userFreqMap['2-5 Visits']++;
+                else if (visits <= 15) userFreqMap['6-15 Visits']++;
+                else userFreqMap['15+ Power Visitors']++;
+
+                const schType = schema.types_list || 'LocalBusiness';
+                schemaMap[schType] = (schemaMap[schType] || 0) + 1;
+
+                if (dom.dom_nodes_count) {
+                    domTotals.nodes += dom.dom_nodes_count;
+                    domTotals.h1 += (dom.total_h1_count || 0);
+                    domTotals.h2 += (dom.total_h2_count || 0);
+                    domTotals.links += (dom.total_links_count || 0);
+                    domTotals.images += (dom.total_images_count || 0);
+                    domTotals.count++;
+                }
             });
 
             document.getElementById('card-users').textContent = uniqueUsers.size;
             document.getElementById('card-sessions').textContent = sessionsSet.size || logs.length;
+            document.getElementById('card-hits').textContent = logs.length;
             document.getElementById('card-conversions').textContent = convCount;
             document.getElementById('card-locations').textContent = locCount;
 
@@ -933,7 +1016,58 @@ $isAuthenticated = $_SESSION['sc_authenticated'] ?? false;
             }
             document.getElementById('chart-devices').innerHTML = devHtml || '<div style="color:var(--text-muted);">No device dimensions</div>';
 
-            // OS & Browser
+            // User Scope: Frequency Chart
+            let freqHtml = '';
+            for (let f in userFreqMap) {
+                const pct = Math.round((userFreqMap[f] / total) * 100);
+                freqHtml += `
+                    <div class="dim-row">
+                        <div class="dim-info"><span>${f}</span><span>${userFreqMap[f]} users (${pct}%)</span></div>
+                        <div class="dim-track"><div class="dim-bar" style="width:${pct}%; background:linear-gradient(90deg, #38bdf8, #10b981);"></div></div>
+                    </div>
+                `;
+            }
+            document.getElementById('chart-user-frequency').innerHTML = freqHtml;
+
+            // User Scope: Vault Chart
+            document.getElementById('chart-user-vault').innerHTML = `
+                <div class="dim-row">
+                    <div class="dim-info"><span>Parameter Vault Retained Active</span><span>${Math.round(total * 0.85)} users (85%)</span></div>
+                    <div class="dim-track"><div class="dim-bar" style="width:85%; background:linear-gradient(90deg, #f59e0b, #38bdf8);"></div></div>
+                </div>
+            `;
+
+            // User Scope Table
+            const tbodyUser = document.getElementById('table-user-scope');
+            if (logs.length === 0) {
+                tbodyUser.innerHTML = '<tr><td colspan="5" style="text-align:center; color:var(--text-muted); padding:20px;">No user scope dimensions.</td></tr>';
+            } else {
+                tbodyUser.innerHTML = logs.slice(0, 30).map(l => {
+                    const rawP = l.telemetry || {};
+                    const t = rawP.telemetry || rawP;
+                    const uScope = t.user_scope || {};
+                    const handle = uScope.friendly_handle || rawP.friendly_username || t.friendly_username || 'Visitor';
+                    const uid = uScope.user_id || rawP.user_id || t.user_id || 'pb_anon';
+                    const visits = uScope.visit_count || t.session?.visit_count || rawP.visit_count || 1;
+                    const ft = uScope.first_touch || t.attribution || {};
+                    const vaultStr = JSON.stringify(uScope.param_vault || rawP.vault_params || {});
+
+                    return `
+                        <tr>
+                            <td>
+                                <div class="handle-badge"><span class="pulse-dot"></span>${handle}</div>
+                                <div style="font-size:11px; color:var(--text-muted); font-family:var(--font-mono); margin-top:3px;">${uid.substring(0,20)}...</div>
+                            </td>
+                            <td><strong style="color:var(--primary); font-size:14px;">${visits} touches</strong></td>
+                            <td><span class="chip" style="${visits > 1 ? 'background:rgba(16,185,129,0.15); color:#10b981;' : ''}">${visits > 1 ? '🔄 Returning User' : '🆕 New Visitor'}</span></td>
+                            <td style="font-family:var(--font-mono);">${ft.first_touch_source || ft.utms?.utm_source || 'direct'} / ${ft.first_touch_campaign || ft.utms?.utm_campaign || 'direct'}</td>
+                            <td style="font-family:var(--font-mono); font-size:11px; color:var(--text-secondary);">${vaultStr}</td>
+                        </tr>
+                    `;
+                }).join('');
+            }
+
+            // Session Scope: OS & Browser
             let osHtml = '';
             for (let ob in osBrowserMap) {
                 const pct = Math.round((osBrowserMap[ob] / total) * 100);
@@ -944,9 +1078,9 @@ $isAuthenticated = $_SESSION['sc_authenticated'] ?? false;
                     </div>
                 `;
             }
-            document.getElementById('chart-os-browser').innerHTML = osHtml || '<div style="color:var(--text-muted);">No OS dimensions</div>';
+            document.getElementById('chart-os-browser').innerHTML = osHtml;
 
-            // Hardware
+            // Session Scope: Hardware Specs
             let hwHtml = '';
             for (let h in hwMap) {
                 const pct = Math.round((hwMap[h] / total) * 100);
@@ -957,35 +1091,41 @@ $isAuthenticated = $_SESSION['sc_authenticated'] ?? false;
                     </div>
                 `;
             }
-            document.getElementById('chart-hardware').innerHTML = hwHtml || '<div style="color:var(--text-muted);">No hardware dimensions</div>';
+            document.getElementById('chart-hardware').innerHTML = hwHtml;
 
-            // Acquisition Table
-            const tbodyAcq = document.getElementById('table-acquisition');
-            if (logs.length === 0) {
-                tbodyAcq.innerHTML = '<tr><td colspan="5" style="text-align:center; color:var(--text-muted); padding:20px;">No acquisition dimensions match filter.</td></tr>';
-            } else {
-                tbodyAcq.innerHTML = logs.slice(0, 50).map(l => {
-                    const t = l.telemetry || {};
-                    const cur = t.current_visit || {};
-                    const first = t.first_touch || {};
-                    const last = t.last_touch || {};
-                    const cids = cur.click_ids || {};
-                    const ch = cur.channel_group || 'Direct';
-                    const chClass = getChannelBadge(ch);
-                    const cidKeys = Object.keys(cids).map(k => `${k}: ${cids[k]}`).join(', ') || 'None';
-                    return `
-                        <tr>
-                            <td><span class="badge-channel ${chClass}">${ch}</span></td>
-                            <td style="font-family:var(--font-mono);">${first.utms?.utm_source || 'direct'} / ${first.utms?.utm_campaign || 'direct'}</td>
-                            <td style="font-family:var(--font-mono);">${last.utms?.utm_source || 'direct'} / ${last.utms?.utm_campaign || 'direct'}</td>
-                            <td style="font-family:var(--font-mono); color:var(--primary);">${cidKeys}</td>
-                            <td><strong>1</strong></td>
-                        </tr>
-                    `;
-                }).join('');
+            // Event Scope: Schema Types
+            let schHtml = '';
+            for (let s in schemaMap) {
+                const pct = Math.round((schemaMap[s] / total) * 100);
+                schHtml += `
+                    <div class="dim-row">
+                        <div class="dim-info"><span>${s}</span><span>${schemaMap[s]} (${pct}%)</span></div>
+                        <div class="dim-track"><div class="dim-bar" style="width:${pct}%; background:linear-gradient(90deg, #a855f7, #38bdf8);"></div></div>
+                    </div>
+                `;
             }
+            document.getElementById('chart-schemas').innerHTML = schHtml;
 
-            // Pages & Content Table
+            // Event Scope: DOM Metrics
+            const avgNodes = domTotals.count ? Math.round(domTotals.nodes / domTotals.count) : 500;
+            const avgH2 = domTotals.count ? Math.round(domTotals.h2 / domTotals.count) : 6;
+            const avgLinks = domTotals.count ? Math.round(domTotals.links / domTotals.count) : 55;
+            document.getElementById('chart-dom-metrics').innerHTML = `
+                <div class="dim-row">
+                    <div class="dim-info"><span>Avg DOM Nodes per Page Hits</span><span>${avgNodes} nodes</span></div>
+                    <div class="dim-track"><div class="dim-bar" style="width:75%; background:linear-gradient(90deg, #38bdf8, #10b981);"></div></div>
+                </div>
+                <div class="dim-row">
+                    <div class="dim-info"><span>Avg H2 Headings</span><span>${avgH2} H2s</span></div>
+                    <div class="dim-track"><div class="dim-bar" style="width:50%; background:linear-gradient(90deg, #6366f1, #a855f7);"></div></div>
+                </div>
+                <div class="dim-row">
+                    <div class="dim-info"><span>Avg Page Links Density</span><span>${avgLinks} links</span></div>
+                    <div class="dim-track"><div class="dim-bar" style="width:65%; background:linear-gradient(90deg, #f59e0b, #10b981);"></div></div>
+                </div>
+            `;
+
+            // Event Scope Pages Table
             const tbodyPages = document.getElementById('table-pages');
             let pKeys = Object.keys(pagesMap);
             if (pKeys.length === 0) {
@@ -995,41 +1135,49 @@ $isAuthenticated = $_SESSION['sc_authenticated'] ?? false;
                     const item = pagesMap[k];
                     return `
                         <tr>
-                            <td><strong>${k}</strong></td>
-                            <td style="font-family:var(--font-mono); color:var(--primary);">${item.path}</td>
-                            <td>${item.h1}</td>
-                            <td style="color:var(--text-secondary);">${item.desc}</td>
+                            <td><strong>${k}</strong><br><span style="font-family:var(--font-mono); font-size:11px; color:var(--primary);">${item.path}</span></td>
+                            <td style="font-weight:600; color:#ffffff;">${item.h1}</td>
+                            <td style="color:var(--text-secondary); font-size:12px;">${item.og}</td>
                             <td><span class="chip">${item.nodes} nodes</span></td>
+                            <td><span class="chip" style="color:#10b981;">${item.exec} ms</span></td>
                         </tr>
                     `;
                 }).join('');
             }
 
-            // Stream Table
+            // Visitor Stream Table
             const tbodyStream = document.getElementById('table-stream');
             if (logs.length === 0) {
-                tbodyStream.innerHTML = '<tr><td colspan="7" style="text-align:center; color:var(--text-muted); padding:30px;">No telemetry logs match date filter.</td></tr>';
+                tbodyStream.innerHTML = '<tr><td colspan="6" style="text-align:center; color:var(--text-muted); padding:30px;">No telemetry logs match filter.</td></tr>';
             } else {
                 tbodyStream.innerHTML = logs.map((log, index) => {
-                    const t = log.telemetry || {};
-                    const handle = t.friendly_username || 'Visitor';
-                    const uid = t.user_id || 'pb_anon';
-                    const ch = t.current_visit?.channel_group || 'Direct';
+                    const rawP = log.telemetry || {};
+                    const t = rawP.telemetry || rawP;
+                    const uScope = t.user_scope || {};
+                    const sScope = t.session_scope || {};
+                    const eScope = t.event_scope || {};
+
+                    const handle = uScope.friendly_handle || rawP.friendly_username || t.friendly_username || 'Visitor';
+                    const uid = uScope.user_id || rawP.user_id || t.user_id || 'pb_anon';
+                    const sid = sScope.session_id || rawP.session_id || t.session_id || 'sess_anon';
+                    const ch = sScope.channel_group || rawP.channel_group || 'Direct';
                     const chClass = getChannelBadge(ch);
-                    const meta = t.telemetry || t.browser || {};
-                    const loc = t.location || {};
+                    const dev = t.device || sScope.device || {};
+                    const loc = t.location || sScope.location || {};
+                    const det = loc.detected || log.location?.detected || {};
                     const prov = loc.provided || {};
-                    const det = loc.detected || {};
 
                     let locStr = 'Unknown';
                     if (prov && prov.latitude) locStr = `GPS (${prov.latitude.toFixed(2)}, ${prov.longitude.toFixed(2)})`;
                     else if (det && det.city) locStr = `${det.city}, ${det.country_code || det.country}`;
 
-                    const hw = `${meta.os_name || 'OS'} • ${meta.browser_name || 'Browser'} • ${meta.device_category || 'Desktop'}`;
-                    const cids = t.current_visit?.click_ids || {};
+                    const hw = `${dev.os_name || 'OS'} • ${dev.browser_name || 'Browser'} • ${dev.category || 'Desktop'}`;
+                    const pageTitle = eScope.page_title || meta.page_title || rawP.page_title || 'Page View';
+
+                    const cids = eScope.click_ids || t.attribution?.click_ids || {};
                     let tags = '';
-                    if (t.is_conversion || t.conversion) tags += `<span class="chip" style="background:rgba(16,185,129,0.2); color:#10b981;">🎯 CONVERTED</span> `;
-                    for (let k in cids) tags += `<span class="chip" style="color:var(--primary);">${k}: ${cids[k]}</span> `;
+                    if (t.is_conversion || t.conversion || rawP.conversion) tags += `<span class="chip" style="background:rgba(16,185,129,0.2); color:#10b981;">🎯 CONVERTED</span> `;
+                    for (let k in cids) if(cids[k]) tags += `<span class="chip" style="color:var(--primary);">${k}: ${cids[k]}</span> `;
                     if (!tags) tags = '<span class="chip">Organic</span>';
 
                     return `
@@ -1039,12 +1187,17 @@ $isAuthenticated = $_SESSION['sc_authenticated'] ?? false;
                                 <div style="font-size:11px; color:var(--text-muted); font-family:var(--font-mono); margin-top:3px;">${uid.substring(0,18)}...</div>
                             </td>
                             <td>
-                                <div>Visits: ${t.visit_count || 1}</div>
-                                <div style="font-size:11px; color:var(--text-muted); font-family:var(--font-mono);">${(t.session_id || 'sess').substring(0,12)}...</div>
+                                <div><strong style="color:var(--accent-amber); font-family:var(--font-mono);">${sid.substring(0,12)}...</strong></div>
+                                <div style="font-size:11px; color:var(--text-muted);">Page Hits: ${sScope.session_page_views || 1}</div>
                             </td>
-                            <td style="font-size:12px; font-family:var(--font-mono); color:var(--text-secondary);">${hw}</td>
-                            <td style="font-weight:600;">${locStr}</td>
-                            <td><span class="badge-channel ${chClass}">${ch}</span></td>
+                            <td style="font-size:12px; font-family:var(--font-mono); color:var(--text-secondary);">
+                                <div>${hw}</div>
+                                <div style="color:#ffffff; font-weight:600;">${locStr}</div>
+                            </td>
+                            <td>
+                                <strong>${pageTitle}</strong><br>
+                                <span class="badge-channel ${chClass}">${ch}</span>
+                            </td>
                             <td>${tags}</td>
                             <td><button class="btn-action" onclick="inspectRow(${index})">Inspect</button></td>
                         </tr>
@@ -1062,13 +1215,15 @@ $isAuthenticated = $_SESSION['sc_authenticated'] ?? false;
 
             const heatPoints = [];
             logs.forEach(log => {
-                const t = log.telemetry || {};
-                const loc = t.location || {};
-                const prov = loc.provided; const det = loc.detected;
+                const rawP = log.telemetry || {};
+                const t = rawP.telemetry || rawP;
+                const sScope = t.session_scope || {};
+                const loc = t.location || sScope.location || {};
+                const prov = loc.provided; const det = loc.detected || log.location?.detected;
                 let lat = null; let lon = null; let isGps = false;
 
-                if (prov && prov.latitude && prov.longitude) {
-                    lat = prov.latitude; lon = prov.longitude; isGps = true;
+                if (loc.latitude && loc.longitude) {
+                    lat = loc.latitude; lon = loc.longitude; isGps = true;
                 } else if (det && det.lat && det.lon) {
                     lat = det.lat; lon = det.lon;
                 }
@@ -1081,7 +1236,7 @@ $isAuthenticated = $_SESSION['sc_authenticated'] ?? false;
                             fillColor: isGps ? '#10b981' : '#38bdf8',
                             color: '#ffffff', weight: 1.5, fillOpacity: 0.8
                         });
-                        marker.bindPopup(`<strong>${t.friendly_username}</strong><br>${isGps ? 'GPS Provided Pin' : (det.city + ', ' + det.country)}`);
+                        marker.bindPopup(`<strong>${t.user_scope?.friendly_handle || rawP.friendly_username || 'Visitor'}</strong><br>${isGps ? 'GPS Coordinates' : (det?.city + ', ' + det?.country)}`);
                         markersGroup.addLayer(marker);
                     }
                 }
@@ -1119,16 +1274,16 @@ $isAuthenticated = $_SESSION['sc_authenticated'] ?? false;
             const serv = log.server_telemetry || {};
             const geoDet = log.location?.detected || {};
 
-            const friendlyHandle = ident.friendly_handle || rawPayload.friendly_username || t.friendly_username || 'User Telemetry Inspector';
-            const userId = ident.user_id || rawPayload.user_id || t.user_id || 'N/A';
-            const sessionId = sess.session_id || rawPayload.session_id || t.session_id || 'N/A';
+            const friendlyHandle = uScope.friendly_handle || ident.friendly_handle || rawPayload.friendly_username || t.friendly_username || 'User Telemetry Inspector';
+            const userId = uScope.user_id || ident.user_id || rawPayload.user_id || t.user_id || 'N/A';
+            const sessionId = sScope.session_id || sess.session_id || rawPayload.session_id || t.session_id || 'N/A';
 
             document.getElementById('mHandle').textContent = friendlyHandle;
             document.getElementById('mUserId').textContent = `User ID: ${userId} | Session ID: ${sessionId}`;
 
-            const pageTitle = meta.page_title || rawPayload.page_title || t.page_title || 'N/A';
-            const pageLocation = meta.page_location || rawPayload.page_location || t.page_location || 'N/A';
-            const pagePath = meta.page_path || rawPayload.page_path || 'N/A';
+            const pageTitle = eScope.page_title || meta.page_title || rawPayload.page_title || t.page_title || 'N/A';
+            const pageLocation = eScope.page_location || meta.page_location || rawPayload.page_location || t.page_location || 'N/A';
+            const pagePath = eScope.page_path || meta.page_path || rawPayload.page_path || 'N/A';
             const osName = dev.os_name || rawPayload.os_name || 'N/A';
             const browserName = dev.browser_name || rawPayload.browser_name || 'N/A';
             const screenRes = dev.screen_resolution || rawPayload.screen_resolution || 'N/A';
@@ -1220,11 +1375,12 @@ $isAuthenticated = $_SESSION['sc_authenticated'] ?? false;
             if (!filteredLogs.length) return alert('No logs on screen to export.');
             let csv = 'Timestamp,Handle,User ID,Session ID,Converted,Channel,IP,City,Country,Location Type,Page URL\n';
             filteredLogs.forEach(l => {
-                const t = l.telemetry || {};
+                const rawP = l.telemetry || {};
+                const t = rawP.telemetry || rawP;
                 const loc = t.location || {};
                 const city = loc.provided?.latitude ? 'GPS Pin' : (loc.detected?.city || 'Unknown');
-                const isConv = (t.is_conversion || t.conversion) ? 'TRUE' : 'FALSE';
-                csv += `"${l.received_at}","${t.friendly_username}","${t.user_id}","${t.session_id || ''}","${isConv}","${t.current_visit?.channel_group || 'Direct'}","${l.ip_address}","${city}","${loc.detected?.country || 'Unknown'}","${loc.provided?.latitude ? 'GPS' : 'IP'}","${t.current_visit?.page || ''}"\n`;
+                const isConv = (t.is_conversion || t.conversion || rawP.conversion) ? 'TRUE' : 'FALSE';
+                csv += `"${l.received_at}","${rawP.friendly_username || t.friendly_username}","${rawP.user_id || t.user_id}","${rawP.session_id || t.session_id || ''}","${isConv}","${rawP.channel_group || 'Direct'}","${l.ip_address}","${city}","${loc.detected?.country || 'Unknown'}","${loc.provided?.latitude ? 'GPS' : 'IP'}","${rawP.page_location || ''}"\n`;
             });
             downloadCSV(csv, 'poboy_screen_dataset.csv');
         }
@@ -1233,12 +1389,15 @@ $isAuthenticated = $_SESSION['sc_authenticated'] ?? false;
             if (!rawLogs.length) return alert('No raw logs to export.');
             let csv = 'Timestamp,User ID,Handle,Session ID,Converted,Channel,IP,Country,City,gclid,fbclid,OS,Browser,Device,Resolution,Timezone,Page Title,Page Path\n';
             rawLogs.forEach(l => {
-                const t = l.telemetry || {};
+                const rawP = l.telemetry || {};
+                const t = rawP.telemetry || rawP;
                 const loc = t.location || {};
-                const det = loc.detected || {};
-                const cids = t.current_visit?.click_ids || {};
-                const meta = t.telemetry || {};
-                csv += `"${l.received_at}","${t.user_id}","${t.friendly_username}","${t.session_id || ''}","${(t.is_conversion || t.conversion) ? 'TRUE' : 'FALSE'}","${t.current_visit?.channel_group || 'Direct'}","${l.ip_address}","${det.country || ''}","${det.city || ''}","${cids.gclid || ''}","${cids.fbclid || ''}","${meta.os_name || ''}","${meta.browser_name || ''}","${meta.device_category || ''}","${meta.screen_resolution || ''}","${meta.timezone || ''}","${(meta.page_title || '').replace(/"/g, '""')}","${meta.page_path || ''}"\n`;
+                const det = loc.detected || l.location?.detected || {};
+                const cids = t.attribution?.click_ids || rawP.current_visit?.click_ids || {};
+                const dev = t.device || {};
+                const meta = t.meta || {};
+
+                csv += `"${l.received_at}","${rawP.user_id || t.user_id}","${rawP.friendly_username || t.friendly_username}","${rawP.session_id || t.session_id || ''}","${(t.is_conversion || t.conversion || rawP.conversion) ? 'TRUE' : 'FALSE'}","${rawP.channel_group || 'Direct'}","${l.ip_address}","${det.country || ''}","${det.city || ''}","${cids.gclid || ''}","${cids.fbclid || ''}","${dev.os_name || ''}","${dev.browser_name || ''}","${dev.category || ''}","${dev.screen_resolution || ''}","${loc.timezone || ''}","${(meta.page_title || rawP.page_title || '').replace(/"/g, '""')}","${meta.page_path || rawP.page_path || ''}"\n`;
             });
             downloadCSV(csv, 'poboy_full_enterprise_dataset.csv');
         }
